@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">List App</string>
+    <string name="welcome_please_log_in_or_sign_up_below">Welcome! Please log in or sign up below.</string>
+    <string name="title_activity_list">ListActivity</string>
+</resources>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/signupName"
+        android:layout_above="@+id/signupPassword"
+        android:hint="Email"
+        android:layout_alignRight="@+id/loginTitle"
+        android:layout_alignEnd="@+id/loginTitle"
+        android:layout_alignLeft="@+id/loginTitle"
+        android:layout_alignStart="@+id/loginTitle"
+        android:textSize="20dp"
+        android:padding="18dp"
+        android:layout_margin="12dp"
+        android:singleLine="true"/>
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/signupPassword"
+        android:layout_centerVertical="true"
+        android:hint="Password"
+        android:layout_alignRight="@+id/signupName"
+        android:layout_alignEnd="@+id/signupName"
+        android:layout_alignLeft="@+id/signupName"
+        android:layout_alignStart="@+id/signupName"
+        android:padding="18dp"
+        android:textSize="20dp"
+        android:singleLine="true"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Log In"
+        android:id="@+id/signupButton"
+        android:layout_below="@+id/signupPassword"
+        android:padding="14dp"
+        android:layout_marginTop="26dp"
+        android:layout_marginBottom="26dp"
+        android:layout_alignRight="@+id/signupPassword"
+        android:layout_alignEnd="@+id/signupPassword"
+        android:layout_alignLeft="@+id/signupPassword"
+        android:layout_alignStart="@+id/signupPassword"
+        android:textSize="20dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Sign Up"
+        android:id="@+id/loginSignup"
+        android:layout_below="@+id/signupButton"
+        android:layout_centerHorizontal="true"
+        android:textSize="18dp"
+        android:clickable="false"/>
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Welcome! Login or sign up below."
+        android:id="@+id/loginTitle"
+        android:layout_above="@+id/signupName"
+        android:layout_centerHorizontal="true"
+        android:padding="22dp"
+        android:textSize="20dp"/>
+</RelativeLayout>
