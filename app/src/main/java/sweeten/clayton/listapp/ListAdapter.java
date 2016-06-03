@@ -20,11 +20,11 @@ public class ListAdapter extends RecyclerView.Adapter {
     private final ListFragment.OnListSelectedInterface mListener;
     Bundle mSavedInstanceState;
     int mPosition;
-    List<String> mTitles = new ArrayList<>(50);
+    List<String> mTitles = new ArrayList<>();
 
     public ListAdapter(ListFragment.OnListSelectedInterface listener, String title, int position) {
 
-        mTitles.add(position,title);
+       // mTitles.add(title);
         mPosition = position;
         mListener = listener;
 
@@ -48,9 +48,9 @@ public class ListAdapter extends RecyclerView.Adapter {
         }
     }
 
-    public void add(String Title, int position) {
+    public void add(String Title) {
         mTitles.add(Title);
-        notifyItemInserted(position);
+        notifyItemInserted(mTitles.size());
     }
 
     public void delete(int position){
@@ -96,8 +96,7 @@ public class ListAdapter extends RecyclerView.Adapter {
                 delete(getAdapterPosition());
             } else {
 
-                mListener.onListSelected(mIndex, mTitles.get(mIndex));
-
+               mListener.onListSelected(getAdapterPosition(), mTitles.get(mIndex));
 
             }
         }

@@ -55,15 +55,14 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.OnS
             toast.show();
         }
         else if (password.trim().length()==0) {
-            Toast toast = Toast.makeText(this, "Please enter a password", Toast.LENGTH_SHORT);
-            toast.show();
+
         }
         else {
             //TODO
             //HTTP POST
 
 
-            }
+        }
 
     }
 }
