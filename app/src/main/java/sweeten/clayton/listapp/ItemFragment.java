@@ -36,7 +36,7 @@ public class ItemFragment extends Fragment {
 
 
         String title = getArguments().getString("TITLE");
-        getActivity().setTitle(title);
+       // getActivity().setTitle(title);
 
         mEditText = (EditText) view.findViewById(R.id.EditTextItems);
 

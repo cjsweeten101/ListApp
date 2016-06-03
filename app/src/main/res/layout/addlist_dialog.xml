@@ -7,7 +7,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Enter a name for a new list:"
+        android:text="Enter a new title"
         android:id="@+id/textView"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"

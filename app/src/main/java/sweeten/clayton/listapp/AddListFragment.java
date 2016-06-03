@@ -22,7 +22,7 @@ public class AddListFragment extends android.support.v4.app.DialogFragment {
     String mTitleString;
 
     public interface OnNewListSelected {
-        void NewList(String title);
+        String NewList(String title);
     }
 
     @NonNull
