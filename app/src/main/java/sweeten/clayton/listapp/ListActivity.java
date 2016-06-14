@@ -250,7 +250,7 @@ public class ListActivity extends AppCompatActivity implements  AddListFragment.
 
         } else {
 
-            //if (mListFragment.isVisible()) {
+            if (mListFragment.isVisible()) {
 
                 Bundle bundle = new Bundle();
                 Map<Integer, String> sortedItems = new TreeMap<>();
@@ -281,7 +281,7 @@ public class ListActivity extends AppCompatActivity implements  AddListFragment.
                 }
                 bundle.putInt("LIST_ID", mListId);
                 setTitle(title);
-            if (mItemFragment == null) {
+
                 FragmentManager fragmentManager = getSupportFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
@@ -292,19 +292,30 @@ public class ListActivity extends AppCompatActivity implements  AddListFragment.
 
                 fragmentTransaction.hide(mListFragment);
                 fragmentTransaction.add(R.id.PlaceHolderLists, fragment, "LIST");
-                // fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();
-            } else {
-                ListFragment fragment = new ListFragment();
-               FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.PlaceHolderLists,fragment);
-                transaction.commit();
-            }
 
+
+            } else {
+
+                setTitle(title);
+                ListFragment listFragment = new ListFragment();
+                Bundle bundle = new Bundle();
+                bundle.putInt("LIST_ID",mListId);
+                bundle.putInt("LIST_SIZE",0);
+
+                listFragment.setArguments(bundle);
+
+                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                transaction.hide(mItemFragment);
+                transaction.addToBackStack("LIST");
+                transaction.add(R.id.PlaceHolderLists, listFragment, "LIST");
+                transaction.commit();
+
+
+            }
         }
     }
-
-   // }
 
     @Override
     public void Edit(String title) {
