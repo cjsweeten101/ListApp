@@ -20,8 +20,9 @@ public class ListFragment extends android.support.v4.app.Fragment {
     public ListAdapter mAdapter;
 
     public interface OnListSelectedInterface {
-        void onListSelected(int position, String title);
+        void onListSelected(int position, String title, View view);
     }
+
 
     @Nullable
     @Override
@@ -31,28 +32,26 @@ public class ListFragment extends android.support.v4.app.Fragment {
 
         View view = inflater.inflate(R.layout.fragment_listoflists, container, false);
 
-        String title = getArguments().getString("TITLE0");
+       // String title = getArguments().getString("TITLE0");
         int size = getArguments().getInt("LIST_SIZE");
+        int id = getArguments().getInt("LIST_ID");
+        Log.v("LISTIDE", String.valueOf(id));
 
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.reyclerView);
-        ListAdapter listAdapter = new ListAdapter(listener, title, size);
+        ListAdapter listAdapter = new ListAdapter(listener, "", size);
         mAdapter = listAdapter;
         recyclerView.setAdapter(listAdapter);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
 
 
-       for (int i = 0; i<size; i++){
-           mAdapter.add(getArguments().getString("TITLE"+i));
+       for (int i = 0; i<size; i++ ){
+           String content = getArguments().getString("TITLE"+i);
+           mAdapter.add(content,Boolean.TRUE,id);
        }
 
         return view;
 
     }
-
-    public void addItem(String title, int Position){
-        mAdapter.add(title);
-    }
-
 }
   

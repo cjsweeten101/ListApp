@@ -23,11 +23,20 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/deleteButton"
-        android:layout_alignParentTop="true"
         android:src="@android:drawable/ic_delete"
         android:backgroundTint="#00ffffff"
         android:adjustViewBounds="false"
         android:layout_alignBottom="@+id/listItems"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"/>
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/editButton"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@+id/deleteButton"
+        android:src="@android:drawable/ic_menu_edit"
+        android:layout_alignBottom="@+id/listItems"
+        android:backgroundTint="#00ffffff"/>
 </RelativeLayout>
