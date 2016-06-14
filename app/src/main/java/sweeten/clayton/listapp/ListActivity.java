@@ -105,7 +105,7 @@ public class ListActivity extends AppCompatActivity implements  AddListFragment.
         mSortedObjects = sortedObjects;
 
         try {
-            String getResult = asyncGet.execute().get();
+            String getResult = asyncGet.execute("http://listaroo.herokuapp.com/api/lists?teamId=2").get();
             JSONArray results = new JSONArray(getResult);
             for (int i = 0; i < results.length(); i++) {
                 JSONObject jsonObject = results.getJSONObject(i);

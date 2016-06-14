@@ -14,15 +14,15 @@ import okhttp3.Response;
 /**
  * Created by Clayton on 6/1/2016.
  */
-public class AsyncGet extends AsyncTask<Void, String, String>{
+public class AsyncGet extends AsyncTask<String, String, String>{
 
     private final OkHttpClient client = new OkHttpClient();
 
     @Override
-    protected String doInBackground(Void... params) {
+    protected String doInBackground(String... params) {
 
         Request request = new Request.Builder()
-                .url("http://listaroo.herokuapp.com/api/lists")
+                .url(params[0])
                 .build();
 
         try {
