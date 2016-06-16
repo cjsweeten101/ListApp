@@ -89,7 +89,7 @@ public class ListAdapter extends RecyclerView.Adapter {
             }
         } else {
             mTitles.add(Title);
-            notifyItemInserted(mTitles.size());
+            notifyItemInserted(mTitles.size()-1);
         }
         return mResults;
     }

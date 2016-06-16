@@ -17,9 +17,13 @@ package sweeten.clayton.listapp;
         import org.json.JSONObject;
 
         import java.io.IOException;
+        import java.util.ArrayDeque;
         import java.util.ArrayList;
+        import java.util.Deque;
+        import java.util.LinkedList;
         import java.util.List;
         import java.util.Map;
+        import java.util.Queue;
         import java.util.TreeMap;
         import java.util.concurrent.ExecutionException;
 
@@ -27,6 +31,7 @@ package sweeten.clayton.listapp;
         import okhttp3.OkHttpClient;
         import okhttp3.Request;
         import okhttp3.Response;
+
 
 
 public class ListActivity extends AppCompatActivity implements  AddListFragment.OnNewListSelected, ListFragment.OnListSelectedInterface, EditDialogFragment.EditInterface{
@@ -41,6 +46,7 @@ public class ListActivity extends AppCompatActivity implements  AddListFragment.
     List<String> mItems = new ArrayList<>();
     ListFragment mItemFragment;
     private Map<Integer, String> mSortedTitles;
+    private Map<Integer,String> mSortedChildrenTitles;
     private Map<String, Integer> mSortedIds;
     private Map<Integer, JSONObject> mSortedObjects;
     private int mListId;
@@ -48,19 +54,34 @@ public class ListActivity extends AppCompatActivity implements  AddListFragment.
     private Map<Integer, String> mSortedItems;
     private String mEditTitle;
     private int mAdapterPosition;
+    Boolean mParent;
+    Deque<Integer> mQueue = new ArrayDeque<>();
+    List<Integer> mDepth = new ArrayList<>();
 
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if(mListFragment.isVisible()){
+        if(mQueue.size()<1){
             return false;
         } else {
             if (keyCode == KeyEvent.KEYCODE_BACK) {
 
-                setTitle("Your Lists");
-                //mFloatingActionButton.show();
+                AsyncGet asyncGet = new AsyncGet();
+                Log.v("QUEUE",mQueue.toString());
+                mQueue.removeLast();
+                if (mQueue.size()<1) {
+                   AddFragmentFromGet("http://listaroo.herokuapp.com/api/lists?teamId=2");
+                } else {
+                    int ID = mQueue.peek();
+                    AddFragmentFromGet("https://listaroo.herokuapp.com/api/lists/" + ID);
+                }
+
+
+
+                //setTitle(mQueue.toString());
+
                 mItemFragment=null;
-                return super.onKeyDown(keyCode, event);
+                //return super.onKeyDown(keyCode, event);
 
             }
         }
@@ -95,7 +116,6 @@ public class ListActivity extends AppCompatActivity implements  AddListFragment.
             }
         });
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-
 
         AsyncGet asyncGet = new AsyncGet();
         Bundle bundle = new Bundle();
@@ -145,7 +165,7 @@ public class ListActivity extends AppCompatActivity implements  AddListFragment.
         FragmentTransaction fragmentTransaction = fragmentManager1.beginTransaction();
         fragmentTransaction.add(R.id.PlaceHolderLists, listFragment, "LIST_FROM_DIALOG");
         fragmentTransaction.commit();
-
+        mParent=true;
     }
 
     @Override
@@ -199,121 +219,71 @@ public class ListActivity extends AppCompatActivity implements  AddListFragment.
 
     @Override
     public void onListSelected(int position, String title, View view) {
+        Map<Integer,String> sortedChildren = new TreeMap<>();
+        AsyncGet asyncGet = new AsyncGet();
 
-        mAdapterPosition = position;
-        int key = 0;
-
-        if(!(mSortedTitles==null)) {
-            for (Map.Entry<Integer, String> entry : mSortedTitles.entrySet()) {
-                key = entry.getKey();
-                if (mSortedTitles.get(key) == title) {
-                    mListId = key;
-                    Log.v("KEYS", String.valueOf(key));
+        int ID=0;
+            if(mParent==true) {
+                for (Map.Entry<Integer, String> entry : mSortedTitles.entrySet()) {
+                    int id = entry.getKey();
+                    if (mSortedTitles.get(id) == title) {
+                        ID = id;
+                    }
                 }
-            }
-        }
-        if(!(mListFragment.isVisible())) {
-            for (Map.Entry<Integer, String> entry : mSortedItems.entrySet()) {
-                int itemID = entry.getKey();
-                if (mSortedItems.get(itemID) == title) {
-                    mItemId = itemID;
-                }
-            }
-        }
-
-        if(view.getId()==R.id.editButton){
-
-
-
-            EditDialogFragment dialog = new EditDialogFragment();
-
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            mFragmentManager = fragmentManager;
-            dialog.show(fragmentManager, "SWAG");
-
-            return;
-        }
-
-        if(view.getId()==R.id.deleteButton) {
-            if(mListFragment.isVisible()){
-                mListFragment.mAdapter.delete(position,true,mListId);
             } else {
-                for(Map.Entry<Integer,String> entry : mSortedItems.entrySet()){
-                   int itemID = entry.getKey();
-                    if(mSortedItems.get(itemID)==title){
-                        mItemId = itemID;
+                for (Map.Entry<Integer,String> entry : mSortedChildrenTitles.entrySet()) {
+                    int id = entry.getKey();
+                    if(mSortedChildrenTitles.get(id) == title) {
+                        ID = id;
                     }
                 }
-                mItemFragment.mAdapter.delete(position,false,mItemId);
 
             }
 
-        } else {
+        try {
+            String results = asyncGet.execute("https://listaroo.herokuapp.com/api/lists/"+ID).get();
+            mQueue.add(ID);
+            Log.v("ID", String.valueOf(ID));
+            JSONObject jsonObject = new JSONObject(results);
 
-            if (mListFragment.isVisible()) {
+            JSONArray jsonArray = jsonObject.getJSONArray("child_lists");
 
-                Bundle bundle = new Bundle();
-                Map<Integer, String> sortedItems = new TreeMap<>();
-                JSONObject jsonObject = mSortedObjects.get(mListId);
-                if (!(jsonObject == null)) {
-                    try {
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    String childTitle = jsonArray.getJSONObject(i).optString("title");
+                    int childId = jsonArray.getJSONObject(i).optInt("id");
 
-                        jsonObject = mSortedObjects.get(mListId);
-                        JSONArray itemsArray = jsonObject.getJSONArray("list_items");
-
-                        for (int i = 0; i < itemsArray.length(); i++) {
-                            String content = itemsArray.getJSONObject(i).optString("content");
-                            int id = itemsArray.getJSONObject(i).optInt("id");
-                            sortedItems.put(id, content);
-                        }
-                        mSortedItems = sortedItems;
-                        bundle.putInt("LIST_SIZE", itemsArray.length());
-
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    int i = 0;
-                    for (Map.Entry<Integer, String> entry : sortedItems.entrySet()) {
-                        String content = entry.getValue();
-                        bundle.putString("TITLE" + i, content);
-                        i++;
-                    }
+                    sortedChildren.put(childId, childTitle);
                 }
-                bundle.putInt("LIST_ID", mListId);
-                setTitle(title);
-
-                FragmentManager fragmentManager = getSupportFragmentManager();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                mSortedChildrenTitles = sortedChildren;
+                int i = 0;
+                Bundle bundle = new Bundle();
+                for (Map.Entry<Integer, String> entry : sortedChildren.entrySet()) {
+                    String bundleTitle = entry.getValue();
+                    bundle.putString("TITLE" + i, bundleTitle);
+                    i++;
+                }
+                bundle.putInt("LIST_SIZE", sortedChildren.size());
+                Log.v("SIZE", String.valueOf(sortedChildren.size()));
 
                 ListFragment fragment = new ListFragment();
                 mItemFragment = fragment;
                 fragment.setArguments(bundle);
-
-
-                fragmentTransaction.hide(mListFragment);
-                fragmentTransaction.add(R.id.PlaceHolderLists, fragment, "LIST");
-                fragmentTransaction.addToBackStack(null);
-                fragmentTransaction.commit();
-
-
-            } else {
-
-                setTitle(title);
-                ListFragment listFragment = new ListFragment();
-                Bundle bundle = new Bundle();
-                bundle.putInt("LIST_ID",mListId);
-                bundle.putInt("LIST_SIZE",0);
-
-                listFragment.setArguments(bundle);
-
                 FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                transaction.hide(mItemFragment);
-                transaction.addToBackStack("LIST");
-                transaction.add(R.id.PlaceHolderLists, listFragment, "LIST");
+
+                transaction.replace(R.id.PlaceHolderLists, fragment, "CHILD");
+                setTitle(title);
                 transaction.commit();
 
+                mParent = false;
 
-            }
+
+
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
     }
 
@@ -333,6 +303,60 @@ public class ListActivity extends AppCompatActivity implements  AddListFragment.
                 }
             }
             mItemFragment.mAdapter.update(mEditTitle,mAdapterPosition,false,mItemId);
+        }
+
+    }
+    public void AddFragmentFromGet(String url){
+        Map<Integer,String> sortedChildren = new TreeMap<>();
+        AsyncGet asyncGet = new AsyncGet();
+        JSONArray jsonArray = new JSONArray();
+
+        try {
+
+            String results = asyncGet.execute(url).get();
+            Log.v("RESULTS",results);
+
+            if(url=="http://listaroo.herokuapp.com/api/lists?teamId=2"){
+                JSONArray jsonArray1 = new JSONArray(results);
+                jsonArray = jsonArray1;
+            } else {
+
+                JSONObject jsonObject = new JSONObject(results);
+
+
+                jsonArray = jsonObject.getJSONArray("child_lists");
+            }
+
+            for (int i = 0; i < jsonArray.length(); i++) {
+                String childTitle = jsonArray.getJSONObject(i).optString("title");
+                int childId = jsonArray.getJSONObject(i).optInt("id");
+
+                sortedChildren.put(childId, childTitle);
+            }
+            mSortedChildrenTitles = sortedChildren;
+            int i = 0;
+            Bundle bundle = new Bundle();
+            for (Map.Entry<Integer, String> entry : sortedChildren.entrySet()) {
+                String bundleTitle = entry.getValue();
+                bundle.putString("TITLE" + i, bundleTitle);
+                i++;
+            }
+            bundle.putInt("LIST_SIZE", sortedChildren.size());
+            Log.v("SIZE", String.valueOf(sortedChildren.size()));
+
+            ListFragment fragment = new ListFragment();
+            mItemFragment = fragment;
+            fragment.setArguments(bundle);
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+
+            transaction.replace(R.id.PlaceHolderLists, fragment, "CHILD");
+            transaction.commit();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
         }
 
     }
