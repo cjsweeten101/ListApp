@@ -57,6 +57,10 @@ public class ListActivity extends AppCompatActivity implements  AddListFragment.
     Boolean mParent;
     Deque<Integer> mQueue = new ArrayDeque<>();
     List<Integer> mDepth = new ArrayList<>();
+    private int mTeamID;
+    private int mParentId;
+    ListFragment mCurrentFragment;
+    private int mCurrentId;
 
 
     @Override
@@ -71,11 +75,14 @@ public class ListActivity extends AppCompatActivity implements  AddListFragment.
                 mQueue.removeLast();
                 if (mQueue.size()<1) {
                    AddFragmentFromGet("http://listaroo.herokuapp.com/api/lists?teamId=2");
+
                 } else {
-                    int ID = mQueue.peek();
+                    int ID = mQueue.peekLast();
+                    Log.v("QUEUE REMOVE", mQueue + "");
+                    Log.v("CALL ID", ID + "");
+                    mParentId = ID;
                     AddFragmentFromGet("https://listaroo.herokuapp.com/api/lists/" + ID);
                 }
-
 
 
                 //setTitle(mQueue.toString());
@@ -94,7 +101,8 @@ public class ListActivity extends AppCompatActivity implements  AddListFragment.
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
-        setTitle("Your Lists");
+        mTeamID = 2;
+        setTitle("Team " +mTeamID);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -160,6 +168,7 @@ public class ListActivity extends AppCompatActivity implements  AddListFragment.
 
         ListFragment listFragment = new ListFragment();
         mListFragment = listFragment;
+        mCurrentFragment = listFragment;
         listFragment.setArguments(bundle);
         FragmentManager fragmentManager1 = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager1.beginTransaction();
@@ -170,80 +179,81 @@ public class ListActivity extends AppCompatActivity implements  AddListFragment.
 
     @Override
     public String NewList(String title) {
+        String result = mCurrentFragment.mAdapter.add(title,false,mTeamID,mParentId);
+        Log.v("RESULTS",result);
 
-        String results;
-        int id;
-
-        if(mListFragment.isVisible()  && (mItemFragment==null)) {
-
-            ListFragment savedFragment = (ListFragment) getSupportFragmentManager()
-                    .findFragmentByTag("LIST_FROM_DIALOG");
-
-            if (savedFragment == null) {
-                ListFragment fragment = new ListFragment();
-
-                //TODO new lists may be fucked up (YUP)
-
-                mListFragment = fragment;
-                FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
-                mTransaction = fragmentTransaction;
-                mTransaction.add(R.id.PlaceHolderLists, fragment, "LIST_FROM_DIALOG");
-                mTransaction.commit();
-            } else {
-                results = savedFragment.mAdapter.add(title,Boolean.FALSE,0);
-                try {
-                    JSONObject jsonObject = new JSONObject(results);
-                    id = jsonObject.optInt("id");
-                    mSortedTitles.put(id,title);
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                mListFragment = savedFragment;
-            }
-
-        } else {
-           results = mItemFragment.mAdapter.add(title, Boolean.FALSE,mListId);
-            try {
-                JSONObject jsonObject = new JSONObject(results);
-               id = jsonObject.optInt("id");
-                mSortedTitles.put(id,title);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
+        JSONObject jsonObject = null;
+        int id=0;
+        String Title="";
+        try {
+            jsonObject = new JSONObject(result);
+            id = (int) jsonObject.opt("id");
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
+        if(mParentId==0) {
+            mSortedTitles.put(id,title);
+        } else {
+            mSortedChildrenTitles.put(id,title);
+            Log.v("CHILD ID AND TITLE", id + Title);
 
-        return null;
+        } mParentId = id;
+
+      return null;
     }
 
     @Override
     public void onListSelected(int position, String title, View view) {
         Map<Integer,String> sortedChildren = new TreeMap<>();
         AsyncGet asyncGet = new AsyncGet();
-
         int ID=0;
-            if(mParent==true) {
+        Log.v("PARENTID" ,mParentId+"");
+        Log.v("CLICKEDTITLE",title);
+            if(mParentId==0) {
                 for (Map.Entry<Integer, String> entry : mSortedTitles.entrySet()) {
                     int id = entry.getKey();
+                   // String Title = entry.getValue();
+                   // Log.v("SORTEDTITLES",Title);
                     if (mSortedTitles.get(id) == title) {
-                        ID = id;
+                       ID = id;
                     }
                 }
             } else {
                 for (Map.Entry<Integer,String> entry : mSortedChildrenTitles.entrySet()) {
                     int id = entry.getKey();
+                    String Title = entry.getValue();
+                    Log.v("SORTED_CHILDREN_TITLES",Title);
                     if(mSortedChildrenTitles.get(id) == title) {
-                        ID = id;
+                       ID = id;
+                        Log.v("FOUND?", id + "");
+
                     }
                 }
 
             }
 
+        switch (view.getId()){
+            case R.id.deleteButton:
+                mCurrentFragment.mAdapter.delete(position,ID);
+                return;
+            case R.id.editButton:
+                mCurrentId = ID;
+                mAdapterPosition = position;
+                EditDialogFragment dialogFragment = new EditDialogFragment();
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                dialogFragment.show(fragmentManager,"EDIT");
+                return;
+        }
+
         try {
             String results = asyncGet.execute("https://listaroo.herokuapp.com/api/lists/"+ID).get();
+
+            mParentId = ID;
+
             mQueue.add(ID);
-            Log.v("ID", String.valueOf(ID));
+            Log.v("QUEUE ADD",mQueue + "");
+            Log.v("PARENT?", String.valueOf(mParentId));
+            Log.v("ID", ID +"");
             JSONObject jsonObject = new JSONObject(results);
 
             JSONArray jsonArray = jsonObject.getJSONArray("child_lists");
@@ -253,6 +263,7 @@ public class ListActivity extends AppCompatActivity implements  AddListFragment.
                     int childId = jsonArray.getJSONObject(i).optInt("id");
 
                     sortedChildren.put(childId, childTitle);
+                    Log.v("ADDCHILDREN", childTitle);
                 }
                 mSortedChildrenTitles = sortedChildren;
                 int i = 0;
@@ -263,10 +274,11 @@ public class ListActivity extends AppCompatActivity implements  AddListFragment.
                     i++;
                 }
                 bundle.putInt("LIST_SIZE", sortedChildren.size());
-                Log.v("SIZE", String.valueOf(sortedChildren.size()));
+
 
                 ListFragment fragment = new ListFragment();
                 mItemFragment = fragment;
+                mCurrentFragment = fragment;
                 fragment.setArguments(bundle);
                 FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
@@ -289,23 +301,16 @@ public class ListActivity extends AppCompatActivity implements  AddListFragment.
 
     @Override
     public void Edit(String title) {
-        mEditTitle = title;
 
-        if(mListFragment.isVisible()){
-            mListFragment.mAdapter.update(mEditTitle, mAdapterPosition, true, mListId);
+        mCurrentFragment.mAdapter.update(title, mAdapterPosition, mCurrentId);
+        if(mParentId==0){
+            mSortedTitles.put(mCurrentId,title);
         } else {
-            if(!(mSortedItems==null)) {
-                for (Map.Entry<Integer, String> entry : mSortedItems.entrySet()) {
-                    int itemID = entry.getKey();
-                    if (mSortedItems.get(itemID) == title) {
-                        mItemId = itemID;
-                    }
-                }
-            }
-            mItemFragment.mAdapter.update(mEditTitle,mAdapterPosition,false,mItemId);
+            mSortedChildrenTitles.put(mCurrentId,title);
         }
-
+        Log.v("ADAPTER AND ID", mAdapterPosition + mCurrentId + "");
     }
+
     public void AddFragmentFromGet(String url){
         Map<Integer,String> sortedChildren = new TreeMap<>();
         AsyncGet asyncGet = new AsyncGet();
@@ -319,10 +324,11 @@ public class ListActivity extends AppCompatActivity implements  AddListFragment.
             if(url=="http://listaroo.herokuapp.com/api/lists?teamId=2"){
                 JSONArray jsonArray1 = new JSONArray(results);
                 jsonArray = jsonArray1;
+                setTitle("Team " +mTeamID);
             } else {
 
                 JSONObject jsonObject = new JSONObject(results);
-
+                setTitle(jsonObject.optString("title"));
 
                 jsonArray = jsonObject.getJSONArray("child_lists");
             }
@@ -342,10 +348,10 @@ public class ListActivity extends AppCompatActivity implements  AddListFragment.
                 i++;
             }
             bundle.putInt("LIST_SIZE", sortedChildren.size());
-            Log.v("SIZE", String.valueOf(sortedChildren.size()));
 
             ListFragment fragment = new ListFragment();
             mItemFragment = fragment;
+            mCurrentFragment = fragment;
             fragment.setArguments(bundle);
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
