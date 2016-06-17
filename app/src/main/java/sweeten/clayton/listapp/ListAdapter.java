@@ -56,27 +56,19 @@ public class ListAdapter extends RecyclerView.Adapter {
         }
     }
 
-    public String add(String Title,Boolean onCreate, int position) {
+    public String add(String Title,Boolean onCreate, int TeamId , int ParentListId) {
 
         if(onCreate==false) {
 
             AsyncCreate asyncCreate = new AsyncCreate();
             JSONObject jsonObject = new JSONObject();
             try {
-                JSONObject listItem = new JSONObject();
-                if(position==0){
-                    jsonObject.put("title", Title);
-                    listItem = jsonObject;
-                    String results = asyncCreate.execute("http://listaroo.herokuapp.com/api/lists", listItem.toString()).get();
-                    mResults = results;
-                } else {
-                    jsonObject.put("content", Title);
-                    jsonObject.put("list_id", position);
-                    listItem = new JSONObject();
-                    listItem.put("list_item", jsonObject);
-                    String results = asyncCreate.execute("http://listaroo.herokuapp.com/api/list_items", listItem.toString()).get();
-                    mResults = results;
-                }
+
+                jsonObject.put("title", Title);
+                jsonObject.put("teamId", TeamId);
+                jsonObject.put("parentListId", ParentListId);
+                String results = asyncCreate.execute("http://listaroo.herokuapp.com/api/lists", jsonObject.toString()).get();
+                mResults = results;
 
                 mTitles.add(Title);
                 notifyItemInserted(mTitles.size());
@@ -94,57 +86,35 @@ public class ListAdapter extends RecyclerView.Adapter {
         return mResults;
     }
 
-    public void delete(int position, Boolean List, int id){
-        if(List==false) {
-            AsyncDelete delete = new AsyncDelete();
-            delete.execute("http://listaroo.herokuapp.com/api/list_items/" + id);
-            mTitles.remove(position);
-            notifyItemRemoved(position);
-        } else {
+    public void delete(int position, int id){
+
             AsyncDelete delete = new AsyncDelete();
             delete.execute("http://listaroo.herokuapp.com/api/lists/" + id);
             mTitles.remove(position);
             notifyItemRemoved(position);
-        }
 
     }
 
-    public void update(String title,int position,  Boolean List, int id){
+    public String update(String title,int position, int id){
         AsyncUpdate update = new AsyncUpdate();
         JSONObject jsonObject = new JSONObject();
-        if(List==false) {
-            try {
-                jsonObject.put("content",title);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            try {
-                update.execute("http://listaroo.herokuapp.com/api/list_items/"+id,jsonObject.toString()).get();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            }
-            mTitles.remove(position);
-            mTitles.add(position,title);
-            notifyItemChanged(position);
-        } else {
+        String results = "";
             try {
                 jsonObject.put("title",title);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            try {
-                update.execute("http://listaroo.herokuapp.com/api/lists/"+id,jsonObject.toString()).get();
+                results = update.execute("http://listaroo.herokuapp.com/api/lists/"+id,jsonObject.toString()).get();
+
             } catch (InterruptedException e) {
                 e.printStackTrace();
             } catch (ExecutionException e) {
                 e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
+
             mTitles.remove(position);
             mTitles.add(position,title);
             notifyItemChanged(position);
-        }
+        return results;
     }
 
     @Override
