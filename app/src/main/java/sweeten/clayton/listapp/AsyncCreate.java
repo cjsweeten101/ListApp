@@ -22,15 +22,22 @@ import okhttp3.Response;
  */
 public class AsyncCreate extends AsyncTask<String, String, String> {
 
+    private final CreateCallback mCallback;
     private Context mContext;
     private ProgressBar mProgressBar;
     private final OkHttpClient client = new OkHttpClient();
     private static final MediaType JSON
             = MediaType.parse("application/json; charset=utf-8");
 
+    public interface CreateCallback {
+       public void createFinished(String result);
+    }
+
     public AsyncCreate(Context context, ProgressBar progressBar) {
         mContext = context;
         mProgressBar = progressBar;
+        CreateCallback createCallback = (CreateCallback) context;
+        mCallback = createCallback;
     }
 
 
@@ -64,6 +71,7 @@ public class AsyncCreate extends AsyncTask<String, String, String> {
     @Override
     protected void onPostExecute(String s) {
         super.onPostExecute(s);
+        mCallback.createFinished(s);
         mProgressBar.setVisibility(View.INVISIBLE);
     }
 }
