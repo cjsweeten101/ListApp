@@ -16,8 +16,8 @@ import android.widget.Toast;
  */
 public class LoginFragment extends Fragment implements View.OnClickListener{
 
-    EditText mEmailEditText;
-    EditText mPasswordEditText;
+    EditText mUserName;
+    EditText mPassword;
     Button mLoginButton;
     TextView mTextView;
 
@@ -26,7 +26,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
     }
 
     public interface OnLoginSelected {
-        void LogIn();
+        void LogIn(String userName, String password);
     }
 
 
@@ -35,6 +35,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_login,container,false);
+        mUserName = (EditText) view.findViewById(R.id.loginUserName);
+        mPassword = (EditText) view.findViewById(R.id.loginPassword);
         mLoginButton = (Button) view.findViewById(R.id.signupButton);
         mLoginButton.setOnClickListener(this);
         mTextView = (TextView) view.findViewById(R.id.loginSignup);
@@ -50,8 +52,10 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
         switch (v.getId()) {
 
             case R.id.signupButton:
+                String password = mPassword.getText().toString();
+                String userName = mUserName.getText().toString();
                 OnLoginSelected listenerLogin = (OnLoginSelected) getActivity();
-                listenerLogin.LogIn();
+                listenerLogin.LogIn(userName, password);
                 break;
             case R.id.loginSignup:
                 OnSignUpSelected listener = (OnSignUpSelected) getActivity();

@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 /**
@@ -20,6 +21,7 @@ public class AddListFragment extends android.support.v4.app.DialogFragment {
     Button mCancelButton;
     EditText mTitle;
     String mTitleString;
+    TextView mPromptTitle;
 
     public interface OnNewListSelected {
         String NewList(String title);
@@ -31,11 +33,22 @@ public class AddListFragment extends android.support.v4.app.DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         final LayoutInflater inflater = getActivity().getLayoutInflater();
         final View view = inflater.inflate(R.layout.addlist_dialog,null);
+        mPromptTitle = (TextView) view.findViewById(R.id.textViewDialog);
+        mTitle = (EditText) view.findViewById(R.id.newTitle);
+        String title="";
+        if(getArguments().getBoolean("INVITE")==false){
+            title = "Please enter a new title";
+        } else {
+            title = "Please enter a username to invite";
+            mTitle.setHint("Username");
+        }
+        mPromptTitle.setText(title);
         builder.setView(view)
         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int id) {
                 mTitle = (EditText) view.findViewById(R.id.newTitle);
+
                 mTitleString = mTitle.getText().toString();
                 if (mTitleString.trim().length()<1){
                     Toast toast = Toast.makeText(getContext(), "Please enter a title", Toast.LENGTH_SHORT);

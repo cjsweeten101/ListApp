@@ -9,6 +9,7 @@ import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 /**
@@ -17,6 +18,7 @@ import android.widget.Toast;
 public class EditDialogFragment extends DialogFragment {
     EditText mEditText;
     String mTitle;
+    TextView mPromptTitle;
 
     public interface EditInterface{
         void Edit(String title);
@@ -29,6 +31,8 @@ public class EditDialogFragment extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         final LayoutInflater inflater = getActivity().getLayoutInflater();
         final View view = inflater.inflate(R.layout.addlist_dialog,null);
+        mPromptTitle = (TextView) view.findViewById(R.id.textViewDialog);
+        mPromptTitle.setText("Please enter a new title");
         builder.setView(view)
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override

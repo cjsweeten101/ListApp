@@ -3,13 +3,12 @@ package sweeten.clayton.listapp;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -22,14 +21,14 @@ import java.util.concurrent.ExecutionException;
  * Created by Clayton on 5/13/2016.
  */
 public class ListAdapter extends RecyclerView.Adapter {
-    private final ListFragment.OnListSelectedInterface mListener;
+    private final ListFragment.onListSelectedInterface mListener;
     Bundle mSavedInstanceState;
     int mPosition;
     List<String> mTitles = new ArrayList<>();
     int mID;
     String mResults = "";
 
-    public ListAdapter(ListFragment.OnListSelectedInterface listener,String title, int position) {
+    public ListAdapter(ListFragment.onListSelectedInterface listener, String title, int position) {
 
        // mTitles.add(title);
         mPosition = position;
@@ -56,11 +55,11 @@ public class ListAdapter extends RecyclerView.Adapter {
         }
     }
 
-    public String add(String Title,Boolean onCreate, int TeamId , int ParentListId) {
+    public String add(String Title, Boolean onCreate, int TeamId , int ParentListId, Context context, ProgressBar progressBar) {
 
         if(onCreate==false) {
 
-            AsyncCreate asyncCreate = new AsyncCreate();
+            AsyncCreate asyncCreate = new AsyncCreate(context, progressBar);
             JSONObject jsonObject = new JSONObject();
             try {
 
@@ -86,6 +85,36 @@ public class ListAdapter extends RecyclerView.Adapter {
         return mResults;
     }
 
+    public String addTeams(String title, int creatorId, Context context, ProgressBar progressBar){
+
+        try {
+            AsyncCreate asyncCreate = new AsyncCreate(context, progressBar);
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("name", title);
+            jsonObject.put("creatorId", creatorId);
+            String result = asyncCreate.execute("http://listaroo.herokuapp.com/api/teams", jsonObject.toString()).get();
+
+            mTitles.add(title);
+            notifyItemInserted(mTitles.size());
+
+            return result;
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    public void deleteTeams(int position, int teamId){
+        AsyncDelete asyncDelete = new AsyncDelete();
+        asyncDelete.execute("http://listaroo.herokuapp.com/api/teams/"+teamId);
+        mTitles.remove(position);
+        notifyItemRemoved(position);
+
+    }
     public void delete(int position, int id){
 
             AsyncDelete delete = new AsyncDelete();

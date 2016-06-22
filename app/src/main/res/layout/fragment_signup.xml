@@ -7,17 +7,17 @@
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:inputType="textPassword"
         android:id="@+id/signupPassword"
         android:hint="Password"
-        android:layout_centerVertical="true"
-        android:layout_alignRight="@+id/signupName"
-        android:layout_alignEnd="@+id/signupName"
-        android:layout_alignLeft="@+id/signupName"
-        android:layout_alignStart="@+id/signupName"
         android:padding="18dp"
         android:textSize="20dp"
-        android:layout_marginBottom="12dp"
-        android:singleLine="true"/>
+        android:singleLine="true"
+        android:layout_below="@+id/signupUserName"
+        android:layout_alignRight="@+id/signupUserName"
+        android:layout_alignEnd="@+id/signupUserName"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"/>
 
     <Button
         android:layout_width="wrap_content"
@@ -26,37 +26,75 @@
         android:id="@+id/signupButton"
         android:padding="14dp"
         android:textSize="20dp"
-        android:layout_marginTop="18dp"
-        android:layout_below="@+id/signupPassword"
-        android:layout_alignRight="@+id/signupPassword"
-        android:layout_alignEnd="@+id/signupPassword"
-        android:layout_alignLeft="@+id/signupPassword"
-        android:layout_alignStart="@+id/signupPassword"/>
+        android:layout_below="@+id/ConfirmPassword"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="33dp"/>
 
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/signupName"
-        android:layout_above="@+id/signupPassword"
-        android:hint="Name"
-        android:layout_alignRight="@+id/loginTitle"
-        android:layout_alignEnd="@+id/loginTitle"
-        android:layout_alignLeft="@+id/loginTitle"
-        android:layout_alignStart="@+id/loginTitle"
+        android:id="@+id/signupUserName"
+        android:hint="UserName"
         android:textSize="20dp"
         android:padding="18dp"
-        android:layout_margin="12dp"
-        android:singleLine="true"/>
+        android:singleLine="true"
+        android:layout_below="@+id/Email"
+        android:layout_alignRight="@+id/LastName"
+        android:layout_alignEnd="@+id/LastName"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"/>
 
-    <TextView
+    <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Enter a username and password."
-        android:id="@+id/loginTitle"
-        android:layout_above="@+id/signupName"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:padding="22dp"
-        android:textSize="20dp"/>
+        android:hint="First Name"
+        android:id="@+id/FirstName"
+        android:layout_alignParentTop="true"
+        android:textSize="20dp"
+        android:padding="18dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_toLeftOf="@+id/LastName"
+        android:layout_toStartOf="@+id/LastName"/>
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="Last Name"
+        android:id="@+id/LastName"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:textSize="20dp"
+        android:padding="18dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"/>
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/Email"
+        android:hint="Email"
+        android:layout_below="@+id/FirstName"
+        android:layout_alignRight="@+id/LastName"
+        android:layout_alignEnd="@+id/LastName"
+        android:textSize="20dp"
+        android:padding="18dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"/>
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="textPassword"
+        android:id="@+id/ConfirmPassword"
+        android:hint="Confirm Password"
+        android:layout_below="@+id/signupPassword"
+        android:textSize="20dp"
+        android:padding="18dp"
+        android:layout_alignRight="@+id/LastName"
+        android:layout_alignEnd="@+id/LastName"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"/>
 
 </RelativeLayout>
