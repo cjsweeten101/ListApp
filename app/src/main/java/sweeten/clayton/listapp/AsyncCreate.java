@@ -1,6 +1,11 @@
 package sweeten.clayton.listapp;
 
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
+import android.view.View;
+import android.widget.ProgressBar;
 
 import org.json.JSONObject;
 
@@ -17,9 +22,17 @@ import okhttp3.Response;
  */
 public class AsyncCreate extends AsyncTask<String, String, String> {
 
+    private Context mContext;
+    private ProgressBar mProgressBar;
     private final OkHttpClient client = new OkHttpClient();
     private static final MediaType JSON
             = MediaType.parse("application/json; charset=utf-8");
+
+    public AsyncCreate(Context context, ProgressBar progressBar) {
+        mContext = context;
+        mProgressBar = progressBar;
+    }
+
 
     @Override
     protected String doInBackground(String... params) {
@@ -40,5 +53,17 @@ public class AsyncCreate extends AsyncTask<String, String, String> {
         }
 
         return null;
+    }
+
+    @Override
+    protected void onPreExecute() {
+        super.onPreExecute();
+        mProgressBar.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    protected void onPostExecute(String s) {
+        super.onPostExecute(s);
+        mProgressBar.setVisibility(View.INVISIBLE);
     }
 }

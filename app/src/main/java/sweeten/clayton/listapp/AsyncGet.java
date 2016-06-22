@@ -1,7 +1,11 @@
 package sweeten.clayton.listapp;
 
+import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.util.Log;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import java.io.IOException;
@@ -16,7 +20,30 @@ import okhttp3.Response;
  */
 public class AsyncGet extends AsyncTask<String, String, String>{
 
+    String mResults;
+
+
     private final OkHttpClient client = new OkHttpClient();
+    private ProgressBar mProgressBar;
+
+
+    public AsyncGet(Context context , ProgressBar progressBar) {
+        mProgressBar = progressBar;
+    }
+
+    @Override
+    protected void onPreExecute() {
+        super.onPreExecute();
+        mProgressBar.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    protected void onPostExecute(String s) {
+        super.onPostExecute(s);
+
+        mResults = s;
+        mProgressBar.setVisibility(View.INVISIBLE);
+    }
 
     @Override
     protected String doInBackground(String... params) {
@@ -39,5 +66,8 @@ public class AsyncGet extends AsyncTask<String, String, String>{
             Log.e("OKHTTP_GET", e.getMessage());
         }
         return null;
+    }
+    public String getResults(){
+        return mResults;
     }
 }

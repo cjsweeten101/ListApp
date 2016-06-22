@@ -25,15 +25,45 @@
     <include layout="@layout/content_list"/>
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
+    android:id="@+id/fab"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom|end"
+    android:layout_margin="@dimen/fab_margin"
+    android:src="@android:drawable/ic_input_add"
+    android:baselineAlignBottom="true"
+    app:backgroundTint="@color/abc_color_highlight_material"
+    android:tint="#ff000000"
+    app:backgroundTintMode="src_over"/>
+
+    <View
+        android:id="@+id/dummy"
+        android:layout_width="1dp"
+        android:layout_height="16dp"
+        app:layout_anchor="@id/fab"
+        app:layout_anchorGravity="top|right|end" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fabInivte"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        android:src="@android:drawable/ic_input_add"
-        android:baselineAlignBottom="true"
+        android:layout_gravity="end|top"
+        android:layout_margin="16dp"
+        android:src="@android:drawable/ic_dialog_email"
+        app:layout_anchor="@id/dummy"
+        app:layout_anchorGravity="top|right|end"
         app:backgroundTint="@color/abc_color_highlight_material"
         android:tint="#ff000000"
-        app:backgroundTintMode="src_over"/>
+        app:backgroundTintMode="src_over"
+        />
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="invisible"/>
+
 
 </android.support.design.widget.CoordinatorLayout>
