@@ -20,28 +20,33 @@ import okhttp3.Response;
  */
 public class AsyncGet extends AsyncTask<String, String, String>{
 
+    private final GetCallBack mCallback;
     String mResults;
 
 
     private final OkHttpClient client = new OkHttpClient();
     private ProgressBar mProgressBar;
 
+    public  interface GetCallBack {
+        void getFinished(String result);
+    }
+
 
     public AsyncGet(Context context , ProgressBar progressBar) {
+        mCallback = (GetCallBack) context;
         mProgressBar = progressBar;
     }
 
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        mProgressBar.setVisibility(View.VISIBLE);
+       // mProgressBar.setVisibility(View.VISIBLE);
     }
 
     @Override
     protected void onPostExecute(String s) {
         super.onPostExecute(s);
-
-        mResults = s;
+        mCallback.getFinished(s);
         mProgressBar.setVisibility(View.INVISIBLE);
     }
 
@@ -66,8 +71,5 @@ public class AsyncGet extends AsyncTask<String, String, String>{
             Log.e("OKHTTP_GET", e.getMessage());
         }
         return null;
-    }
-    public String getResults(){
-        return mResults;
     }
 }

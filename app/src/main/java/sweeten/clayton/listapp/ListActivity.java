@@ -26,7 +26,7 @@ package sweeten.clayton.listapp;
         import java.util.concurrent.ExecutionException;
 
 
-public class ListActivity extends AppCompatActivity implements  AddListFragment.OnNewListSelected, ListFragment.onListSelectedInterface, EditDialogFragment.EditInterface{
+public class ListActivity extends AppCompatActivity implements  AddListFragment.OnNewListSelected, ListFragment.onListSelectedInterface, EditDialogFragment.EditInterface, AsyncCreate.CreateCallback , AsyncGet.GetCallBack{
 
     int mPosition;
     FragmentManager mFragmentManager;
@@ -416,6 +416,19 @@ public class ListActivity extends AppCompatActivity implements  AddListFragment.
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
+
+    }
+
+    @Override
+    public void createFinished(String result) {
+
+    }
+
+    @Override
+    public void getFinished(String result) {
+
+
+
 
     }
 }

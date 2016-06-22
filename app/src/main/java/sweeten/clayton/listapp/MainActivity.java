@@ -17,7 +17,7 @@ import org.json.JSONObject;
 import java.util.concurrent.ExecutionException;
 
 
-public class MainActivity extends AppCompatActivity implements LoginFragment.OnSignUpSelected, LoginFragment.OnLoginSelected, SignupFragment.OnSignUp {
+public class MainActivity extends AppCompatActivity implements LoginFragment.OnSignUpSelected, LoginFragment.OnLoginSelected, SignupFragment.OnSignUp, AsyncCreate.CreateCallback {
     public static final String LIST_FRAGMENT = "list_fragment";
     private ProgressBar mProgressBar;
 
@@ -53,28 +53,9 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.OnS
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("username", userName);
             jsonObject.put("password", password);
-            String results = asyncCreate.execute("http://listaroo.herokuapp.com/api/login", jsonObject.toString()).get();
-            JSONObject jsonObjectResults = new JSONObject(results);
-             Log.v("LOGIN_RESULTS", results);
-            if((results.length()<1) || !(jsonObjectResults.opt("errors")==null)) {
-                Toast toast = Toast.makeText(this, "Incorrect Login or Password", Toast.LENGTH_SHORT);
-                toast.show();
-            } else {
-
-                int id = (int) jsonObjectResults.opt("id");
-
-                Intent intent = new Intent(this, PagerActivity.class);
-                intent.putExtra("Id",id);
-                startActivity(intent);
-
-
-           }
+            asyncCreate.execute("http://listaroo.herokuapp.com/api/login", jsonObject.toString());
 
         } catch (JSONException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
             e.printStackTrace();
         }
 
@@ -82,30 +63,12 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.OnS
 
     @Override
     public void SignUp(String UserName, String password, String ConfirmPassword, String FirstName, String LastName, String Email) {
-        if (UserName.trim().length()==0  && password.trim().length() == 0){
 
-        }
-        else if(UserName.trim().length() == 0) {
-            Toast toast = Toast.makeText(this, "Please enter a user name", Toast.LENGTH_SHORT);
-            toast.show();
-        }
-        else if (password.trim().length()==0) {
-            Toast toast = Toast.makeText(this, "Please enter a password", Toast.LENGTH_SHORT);
-            toast.show();
-        }
-        else if (!(password.equals(ConfirmPassword))) {
-            Toast toast = Toast.makeText(this, "Passwords don't match!", Toast.LENGTH_SHORT);
-            toast.show();
-        }
-        else if (FirstName.trim().length()==0 || LastName.trim().length()==0) {
-            Toast toast = Toast.makeText(this, "Please enter first and last name", Toast.LENGTH_SHORT);
-            toast.show();
-        }
-        else if (Email.trim().length()==0) {
-            Toast toast = Toast.makeText(this, "Please enter an Email", Toast.LENGTH_SHORT);
-            toast.show();
-        } else {
             try {
+                Log.v("PASSWORD", password);
+                Log.v("PASSWORD CONFIRM",ConfirmPassword);
+
+                String test = "test";
                 AsyncCreate asyncCreate = new AsyncCreate(this,mProgressBar);
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put("username", UserName);
@@ -116,11 +79,35 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.OnS
                 jsonObject.put("email",Email);
                 asyncCreate.execute("http://listaroo.herokuapp.com/api/signup", jsonObject.toString());
 
-                Intent intent = new Intent(this, ListActivity.class);
-                startActivity(intent);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+        }
+
+    @Override
+    public void createFinished(String result) {
+
+        try {
+
+            JSONObject jsonObjectResults = new JSONObject(result);
+            Log.v("CALLBACK RESULTS", result);
+            if (!(jsonObjectResults.opt("errors") == null)) {
+                String error = jsonObjectResults.getJSONArray("errors").getString(0);
+                Toast toast = Toast.makeText(this, error, Toast.LENGTH_LONG);
+                toast.show();
+            } else {
+
+                int id = (int) jsonObjectResults.opt("id");
+
+                Intent intent = new Intent(this, PagerActivity.class);
+                intent.putExtra("Id", id);
+                startActivity(intent);
+
+
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
 
     }
