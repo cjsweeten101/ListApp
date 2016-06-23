@@ -2,7 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="vertical"
               android:layout_width="match_parent"
-              android:layout_height="match_parent">
+              android:layout_height="match_parent"
+                android:background="@color/colorPrimary">
 
     <TextView
         android:layout_width="wrap_content"
@@ -14,7 +15,8 @@
         android:layout_alignParentTop="true"
         android:textSize="20dp"
         android:layout_gravity="center_horizontal"
-        android:padding="15dp"/>
+        android:padding="15dp"
+        android:textColor="#ffffff"/>
 
     <EditText
         android:layout_width="match_parent"
@@ -28,6 +30,8 @@
         android:hint="Title"
         android:singleLine="true"
         android:layout_gravity="center_horizontal"
+        android:textColorHint="#ffffff"
+        android:textColor="#ffffff"
         />
 
 </RelativeLayout>

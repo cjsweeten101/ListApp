@@ -1,8 +1,8 @@
 package sweeten.clayton.listapp;
 
 import android.app.Dialog;
-import android.app.DialogFragment;
 import android.content.DialogInterface;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.app.AlertDialog;
 import android.support.annotation.NonNull;
@@ -36,6 +36,8 @@ public class AddListFragment extends android.support.v4.app.DialogFragment {
         mPromptTitle = (TextView) view.findViewById(R.id.textViewDialog);
         mTitle = (EditText) view.findViewById(R.id.newTitle);
         String title="";
+
+
         if(getArguments().getBoolean("INVITE")==false){
             title = "Please enter a new title";
         } else {
@@ -65,11 +67,18 @@ public class AddListFragment extends android.support.v4.app.DialogFragment {
                 .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         AddListFragment.this.getDialog().cancel();
+
                     }
                 });
 
 
         return builder.create();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        (getDialog()).getWindow().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.colorPrimary)));
     }
 
 }

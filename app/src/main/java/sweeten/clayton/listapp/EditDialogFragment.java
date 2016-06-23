@@ -3,6 +3,7 @@ package sweeten.clayton.listapp;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
@@ -59,5 +60,11 @@ public class EditDialogFragment extends DialogFragment {
 
 
         return builder.create();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        (getDialog()).getWindow().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.colorPrimary)));
     }
 }

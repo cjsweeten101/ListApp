@@ -13,6 +13,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -35,6 +36,8 @@ public class PagerActivity extends AppCompatActivity implements ListFragment.onL
     private ProgressBar mProgressBar;
     private String mResult;
     int mGetCounter;
+    private String mNewTitle;
+    private ListFragment mListFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,11 +84,14 @@ public class PagerActivity extends AppCompatActivity implements ListFragment.onL
     @Override
     public void onListSelected(int position, String title, View view) {
 
+
         Intent intent = new Intent(this, ListActivity.class);
         int id = 0;
         if (mTabPosition == 0) {
+            Log.v("CREATEDCLCIK","HELLO");
             for (Map.Entry<Integer, String> entry : mSortedCreatedTeams.entrySet()) {
-                if (entry.getValue() == title) {
+                if (entry.getValue().equals(title)) {
+                    Log.v("CREATEDTEAMFOUND","SWUG");
                     intent.putExtra("TITLE", entry.getValue());
                     intent.putExtra("ID", entry.getKey());
                     id = entry.getKey();
@@ -93,7 +99,7 @@ public class PagerActivity extends AppCompatActivity implements ListFragment.onL
             }
         } else {
             for (Map.Entry<Integer, String> entry : mSortedInvitedTeams.entrySet()) {
-                if (entry.getValue() == title) {
+                if (entry.getValue().equals(title)) {
                     intent.putExtra("TITLE", entry.getValue());
                     intent.putExtra("ID", entry.getKey());
                     id = entry.getKey();
@@ -111,27 +117,53 @@ public class PagerActivity extends AppCompatActivity implements ListFragment.onL
 
     @Override
     public String NewList(String title) {
-        try {
-            ListFragment listFragment = (ListFragment) mAdapter.getRegisteredFragment(mPager.getCurrentItem());
-            String result = listFragment.mAdapter.addTeams(title, mCreatorId,this, mProgressBar);
-            JSONObject jsonObject = new JSONObject(result);
-            int id = jsonObject.optInt("id");
-            mSortedCreatedTeams.put(id,title);
-            return result;
-        } catch (JSONException e) {
-            e.printStackTrace();
+
+        if(title.length()<1){
+            Toast toast = Toast.makeText(this, "Please enter a title", Toast.LENGTH_LONG);
+            toast.show();
         }
+        for(Map.Entry<Integer,String> entry : mSortedCreatedTeams.entrySet()) {
+            if(entry.getValue().equals(title)){
+                Toast toast = Toast.makeText(this, "A team with that name already exists", Toast.LENGTH_LONG);
+                toast.show();
+                return null;
+            }
+
+        }
+        ListFragment listFragment = (ListFragment) mAdapter.getRegisteredFragment(mPager.getCurrentItem());
+        listFragment.mAdapter.addTeams(title, mCreatorId,this, mProgressBar);
+        mNewTitle = title;
+
         return null;
     }
 
     @Override
     public void createFinished(String result) {
 
+        try {
+            Log.v("result",result);
+            JSONObject jsonObject = new JSONObject(result);
+            if(!(jsonObject.optString("errors").length()<1)){
+                Toast toast = Toast.makeText(this,jsonObject.optString("errors"),Toast.LENGTH_LONG);
+                toast.show();
+            } else {
+                int id = jsonObject.optInt("id");
+                String title = jsonObject.optString("name");
+                mSortedCreatedTeams.put(id,title);
+                Log.v("ID",id +"");
+                Log.v("TITLE", mNewTitle);
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
     }
 
     @Override
     public void getFinished(String result) {
         try {
+            //mProgressBar.setVisibility(View.VISIBLE);
 
             if (mGetCounter == 0) {
 
@@ -190,7 +222,7 @@ public class PagerActivity extends AppCompatActivity implements ListFragment.onL
 
                     }
                 });
-
+                mProgressBar.setVisibility(View.INVISIBLE);
             }
 
         } catch (JSONException e) {
