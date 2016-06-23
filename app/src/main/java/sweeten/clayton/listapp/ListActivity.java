@@ -58,6 +58,7 @@ public class ListActivity extends AppCompatActivity implements  AddListFragment.
     private boolean mAddListListener;
 
     private ProgressBar mProgressBar;
+    private String mInviteTitle;
 
 
     @Override
@@ -208,50 +209,17 @@ public class ListActivity extends AppCompatActivity implements  AddListFragment.
     public String NewList(String title) {
 
         if(mAddListListener==true) {
-            String result = mCurrentFragment.mAdapter.add(title, false, mTeamID, mParentId,this, mProgressBar);
-            Log.v("RESULTS", result);
+            mCurrentFragment.mAdapter.add(title, false, mTeamID, mParentId,this, mProgressBar);
 
-            JSONObject jsonObject = null;
-            int id = 0;
-            String Title = "";
-            try {
-                jsonObject = new JSONObject(result);
-                id = (int) jsonObject.opt("id");
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            if (mParentId == 0) {
-                mSortedTitles.put(id, title);
-                Log.v("PUT IN TITLES", "NICE");
-            } else {
-                mSortedChildrenTitles.put(id, title);
-                Log.v("CHILD ID AND TITLE", id + Title);
-                // mParentId = id;
-            } // mParentId = id;
         } else {
             AsyncCreate asyncCreate = new AsyncCreate(this,mProgressBar);
             JSONObject jsonObject = new JSONObject();
             try {
+                mInviteTitle = title;
                 jsonObject.put("username", title);
 
-                String results = asyncCreate.execute("http://listaroo.herokuapp.com/api/teams/" + mTeamID + "/invite", jsonObject.toString()).get();
+                asyncCreate.execute("http://listaroo.herokuapp.com/api/teams/" + mTeamID + "/invite", jsonObject.toString());
 
-                JSONObject jsonObjectResults = new JSONObject(results);
-                Log.v("RESULTS",results);
-                if(jsonObjectResults.opt("errors")==null) {
-                    Toast toast = Toast.makeText(this, title + " invited!", Toast.LENGTH_LONG);
-                    toast.show();
-                } else {
-                    String error = jsonObjectResults.getJSONArray("errors").getString(0);
-                    Toast toast = Toast.makeText(this, error, Toast.LENGTH_LONG);
-                    toast.show();
-                }
-
-
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -422,12 +390,41 @@ public class ListActivity extends AppCompatActivity implements  AddListFragment.
     @Override
     public void createFinished(String result) {
 
+        try {
+
+
+            JSONObject jsonObject = new JSONObject(result);
+
+            if (mAddListListener == true) {
+                String title =  jsonObject.optString("title");
+                int id = jsonObject.optInt("id");
+                if (mParentId == 0) {
+                    mSortedTitles.put(id, title);
+                } else {
+                    mSortedChildrenTitles.put(id,title);
+                }
+
+
+            } else {
+                if(jsonObject.opt("errors")==null) {
+                    Toast toast = Toast.makeText(this, mInviteTitle + " invited!", Toast.LENGTH_LONG);
+                    toast.show();
+                } else {
+                    String error = jsonObject.getJSONArray("errors").getString(0);
+                    Toast toast = Toast.makeText(this, error, Toast.LENGTH_LONG);
+                    toast.show();
+                }
+
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
     }
 
     @Override
     public void getFinished(String result) {
-
-
 
 
     }

@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/backgroundColor"
     android:fitsSystemWindows="true"
     tools:context="sweeten.clayton.listapp.ListActivity">
 
@@ -17,8 +18,9 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:popupTheme="@style/AppTheme.PopupOverlay"/>
+            android:background="?attr/colorPrimaryDark"
+            app:popupTheme="@style/AppTheme.PopupOverlay"
+            />
 
     </android.support.design.widget.AppBarLayout>
 
@@ -32,8 +34,8 @@
     android:layout_margin="@dimen/fab_margin"
     android:src="@android:drawable/ic_input_add"
     android:baselineAlignBottom="true"
-    app:backgroundTint="@color/abc_color_highlight_material"
-    android:tint="#ff000000"
+    app:backgroundTint="@color/colorPrimaryLight"
+    android:tint="#ffffff"
     app:backgroundTintMode="src_over"/>
 
     <View
@@ -52,8 +54,8 @@
         android:src="@android:drawable/ic_dialog_email"
         app:layout_anchor="@id/dummy"
         app:layout_anchorGravity="top|right|end"
-        app:backgroundTint="@color/abc_color_highlight_material"
-        android:tint="#ff000000"
+        app:backgroundTint="@color/colorPrimaryLight"
+        android:tint="#ffffff"
         app:backgroundTintMode="src_over"
         />
 

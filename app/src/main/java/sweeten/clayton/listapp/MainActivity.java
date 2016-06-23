@@ -1,13 +1,17 @@
 package sweeten.clayton.listapp;
 
 
+import android.app.ActionBar;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import android.util.Log;
+import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -20,6 +24,7 @@ import java.util.concurrent.ExecutionException;
 public class MainActivity extends AppCompatActivity implements LoginFragment.OnSignUpSelected, LoginFragment.OnLoginSelected, SignupFragment.OnSignUp, AsyncCreate.CreateCallback {
     public static final String LIST_FRAGMENT = "list_fragment";
     private ProgressBar mProgressBar;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,12 +73,11 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.OnS
                 Log.v("PASSWORD", password);
                 Log.v("PASSWORD CONFIRM",ConfirmPassword);
 
-                String test = "test";
                 AsyncCreate asyncCreate = new AsyncCreate(this,mProgressBar);
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put("username", UserName);
                 jsonObject.put("password", password);
-                jsonObject.put("password_confirmation", ConfirmPassword);
+                jsonObject.put("passwordConf", ConfirmPassword);
                 jsonObject.put("first_name", FirstName);
                 jsonObject.put("last_name", LastName);
                 jsonObject.put("email",Email);
@@ -88,27 +92,37 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.OnS
     public void createFinished(String result) {
 
         try {
-
-            JSONObject jsonObjectResults = new JSONObject(result);
-            Log.v("CALLBACK RESULTS", result);
-            if (!(jsonObjectResults.opt("errors") == null)) {
-                String error = jsonObjectResults.getJSONArray("errors").getString(0);
-                Toast toast = Toast.makeText(this, error, Toast.LENGTH_LONG);
+            if (result == null) {
+                Toast toast = Toast.makeText(this, "Incorrect username or password", Toast.LENGTH_LONG);
                 toast.show();
             } else {
 
-                int id = (int) jsonObjectResults.opt("id");
+                JSONObject jsonObjectResults = new JSONObject(result);
+                Log.v("CALLBACK RESULTS", result);
+                if (!(jsonObjectResults.opt("errors") == null)) {
+                    String error = jsonObjectResults.optString("errors");
+                   // String error = jsonObjectResults.getJSONArray("errors").getString(0);
+                    Toast toast = Toast.makeText(this, error, Toast.LENGTH_LONG);
+                    toast.show();
+                } else {
 
-                Intent intent = new Intent(this, PagerActivity.class);
-                intent.putExtra("Id", id);
-                startActivity(intent);
+                    int id = (int) jsonObjectResults.opt("id");
 
+                    Intent intent = new Intent(this, PagerActivity.class);
+                    intent.putExtra("Id", id);
+                    startActivity(intent);
+
+
+                }
+            }
+
+            }catch(JSONException e){
+                e.printStackTrace();
 
             }
 
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        mProgressBar.setVisibility(View.INVISIBLE);
+
 
     }
 }

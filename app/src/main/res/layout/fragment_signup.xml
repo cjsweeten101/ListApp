@@ -28,7 +28,9 @@
         android:textSize="20dp"
         android:layout_below="@+id/ConfirmPassword"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="33dp"/>
+        android:layout_marginTop="33dp"
+        android:background="@color/colorPrimaryLight"
+        android:textColor="#ffffff"/>
 
     <EditText
         android:layout_width="wrap_content"

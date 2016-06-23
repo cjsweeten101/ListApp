@@ -48,7 +48,9 @@
         android:layout_alignEnd="@+id/loginPassword"
         android:layout_alignLeft="@+id/loginPassword"
         android:layout_alignStart="@+id/loginPassword"
-        android:textSize="20dp"/>
+        android:textSize="20dp"
+        android:textColor="#ffffff"
+        android:background="@color/colorPrimaryLight"/>
 
     <TextView
         android:layout_width="wrap_content"

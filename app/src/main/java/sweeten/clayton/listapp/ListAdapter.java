@@ -66,16 +66,11 @@ public class ListAdapter extends RecyclerView.Adapter {
                 jsonObject.put("title", Title);
                 jsonObject.put("teamId", TeamId);
                 jsonObject.put("parentListId", ParentListId);
-                String results = asyncCreate.execute("http://listaroo.herokuapp.com/api/lists", jsonObject.toString()).get();
-                mResults = results;
+                asyncCreate.execute("http://listaroo.herokuapp.com/api/lists", jsonObject.toString());
 
                 mTitles.add(Title);
                 notifyItemInserted(mTitles.size());
             } catch (JSONException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
                 e.printStackTrace();
             }
         } else {
@@ -85,34 +80,31 @@ public class ListAdapter extends RecyclerView.Adapter {
         return mResults;
     }
 
-    public String addTeams(String title, int creatorId, Context context, ProgressBar progressBar){
+    public void addTeams(String title, int creatorId, Context context, ProgressBar progressBar){
 
         try {
             AsyncCreate asyncCreate = new AsyncCreate(context, progressBar);
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("name", title);
             jsonObject.put("creatorId", creatorId);
-            String result = asyncCreate.execute("http://listaroo.herokuapp.com/api/teams", jsonObject.toString()).get();
+            asyncCreate.execute("http://listaroo.herokuapp.com/api/teams", jsonObject.toString());
 
             mTitles.add(title);
             notifyItemInserted(mTitles.size());
 
-            return result;
+
 
         } catch (JSONException e) {
             e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
         }
-        return null;
+
     }
     public void deleteTeams(int position, int teamId){
         AsyncDelete asyncDelete = new AsyncDelete();
         asyncDelete.execute("http://listaroo.herokuapp.com/api/teams/"+teamId);
         mTitles.remove(position);
         notifyItemRemoved(position);
+
 
     }
     public void delete(int position, int id){
