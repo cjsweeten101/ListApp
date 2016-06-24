@@ -1,6 +1,9 @@
 package sweeten.clayton.listapp;
 
+import android.content.Context;
 import android.os.AsyncTask;
+import android.view.View;
+import android.widget.ProgressBar;
 
 import java.io.IOException;
 
@@ -21,6 +24,18 @@ public class AsyncUpdate extends AsyncTask<String, String, String> {
     private static final MediaType JSON
             = MediaType.parse("application/json; charset=utf-8");
 
+    private ProgressBar mProgressBar;
+    private UpdateCallBack mCallBack;
+
+    public AsyncUpdate(Context context, ProgressBar progressBar) {
+        mProgressBar = progressBar;
+        mCallBack = (UpdateCallBack) context;
+    }
+
+    public  interface UpdateCallBack {
+        void updateFinished(String result);
+    }
+
     @Override
     protected String doInBackground(String... params) {
 
@@ -40,5 +55,18 @@ public class AsyncUpdate extends AsyncTask<String, String, String> {
         }
 
         return null;
+    }
+
+    @Override
+    protected void onPreExecute() {
+        super.onPreExecute();
+        mProgressBar.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    protected void onPostExecute(String s) {
+        super.onPostExecute(s);
+        mCallBack.updateFinished(s);
+        mProgressBar.setVisibility(View.INVISIBLE);
     }
 }

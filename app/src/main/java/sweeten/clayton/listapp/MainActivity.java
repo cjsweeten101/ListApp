@@ -107,9 +107,11 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.OnS
                 } else {
 
                     int id = (int) jsonObjectResults.opt("id");
+                    int token = jsonObjectResults.optInt("api_token");
 
                     Intent intent = new Intent(this, PagerActivity.class);
                     intent.putExtra("Id", id);
+                    intent.putExtra("token",token);
                     startActivity(intent);
 
 
