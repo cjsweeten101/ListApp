@@ -116,18 +116,14 @@ public class ListAdapter extends RecyclerView.Adapter {
 
     }
 
-    public String update(String title,int position, int id){
-        AsyncUpdate update = new AsyncUpdate();
+    public void update(String title,int position, int id, ProgressBar progressBar, Context context){
+        AsyncUpdate update = new AsyncUpdate(context, progressBar);
         JSONObject jsonObject = new JSONObject();
         String results = "";
             try {
                 jsonObject.put("title",title);
-                results = update.execute("http://listaroo.herokuapp.com/api/lists/"+id,jsonObject.toString()).get();
+                update.execute("http://listaroo.herokuapp.com/api/lists/"+id,jsonObject.toString());
 
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -135,7 +131,23 @@ public class ListAdapter extends RecyclerView.Adapter {
             mTitles.remove(position);
             mTitles.add(position,title);
             notifyItemChanged(position);
-        return results;
+    }
+    public void updateTeam(String title, int position, int id, ProgressBar progressBar, Context context) {
+        try {
+            JSONObject jsonObject = new JSONObject();
+            AsyncUpdate update = new AsyncUpdate(context, progressBar);
+            jsonObject.put("name", title);
+            update.execute("http://listaroo.herokuapp.com/api/teams/" + id, jsonObject.toString());
+
+            mTitles.remove(position);
+            mTitles.add(position,title);
+            notifyItemChanged(position);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
     }
 
     @Override

@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ExecutionException;
 
-public class PagerActivity extends AppCompatActivity implements ListFragment.onListSelectedInterface, AddListFragment.OnNewListSelected, AsyncCreate.CreateCallback, AsyncGet.GetCallBack{
+public class PagerActivity extends AppCompatActivity implements ListFragment.onListSelectedInterface, AddListFragment.OnNewListSelected, AsyncCreate.CreateCallback, AsyncGet.GetCallBack, EditDialogFragment.EditInterface, AsyncUpdate.UpdateCallBack{
     ViewPager mPager;
     PagerAdapter mAdapter;
     private Map<Integer, String> mSortedCreatedTeams = new TreeMap<>();
@@ -38,6 +38,8 @@ public class PagerActivity extends AppCompatActivity implements ListFragment.onL
     int mGetCounter;
     private String mNewTitle;
     private ListFragment mListFragment;
+    private int mCuurentId;
+    private int mCurrentPosition;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,11 +108,23 @@ public class PagerActivity extends AppCompatActivity implements ListFragment.onL
                 }
             }
         }
+        ListFragment listFragment = (ListFragment) mAdapter.getRegisteredFragment(mPager.getCurrentItem());
+        mListFragment = listFragment;
         switch(view.getId()) {
+
             case R.id.deleteButton:
-                ListFragment listFragment = (ListFragment) mAdapter.getRegisteredFragment(mPager.getCurrentItem());
-                listFragment.mAdapter.deleteTeams(position,id);
+                mListFragment.mAdapter.deleteTeams(position,id);
                 return;
+            case R.id.editButton:
+                mCuurentId = id;
+                mCurrentPosition = position;
+                EditDialogFragment dialogFragment = new EditDialogFragment();
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                dialogFragment.show(fragmentManager,"EDIT");
+                return;
+
+
+
         }
         startActivity(intent);
     }
@@ -228,5 +242,21 @@ public class PagerActivity extends AppCompatActivity implements ListFragment.onL
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void Edit(String title) {
+
+        mListFragment.mAdapter.updateTeam(title,mCurrentPosition,mCuurentId, mProgressBar, this);
+                if(mTabPosition==0){
+                    mSortedCreatedTeams.put(mCuurentId,title);
+                } else {
+                    mSortedInvitedTeams.put(mCuurentId,title);
+                }
+    }
+
+    @Override
+    public void updateFinished(String result) {
+
     }
 }
