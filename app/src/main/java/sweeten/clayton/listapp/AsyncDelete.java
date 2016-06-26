@@ -23,6 +23,8 @@ public class AsyncDelete extends AsyncTask<String, String, String> {
                 .url(params[0])
                 .delete(null)
                 .addHeader("content-type", "application/json")
+                .addHeader("useridaroo",params[1])
+                .addHeader("autharoo-token",params[2])
                 .build();
 
         String response = "";

@@ -40,7 +40,7 @@ public class AsyncGet extends AsyncTask<String, String, String>{
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-       // mProgressBar.setVisibility(View.VISIBLE);
+        mProgressBar.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -55,6 +55,8 @@ public class AsyncGet extends AsyncTask<String, String, String>{
 
         Request request = new Request.Builder()
                 .url(params[0])
+                .addHeader("useridaroo",params[1])
+                .addHeader("autharoo-token",params[2])
                 .build();
 
         try {

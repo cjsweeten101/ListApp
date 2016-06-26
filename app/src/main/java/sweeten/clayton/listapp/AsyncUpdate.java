@@ -43,6 +43,8 @@ public class AsyncUpdate extends AsyncTask<String, String, String> {
         Request request = new Request.Builder()
                 .url(params[0])
                 .addHeader("Content-Type","application/json")
+                .addHeader("useridaroo",params[2])
+                .addHeader("autharoo-token",params[3])
                 .put(body)
                 .build();
         Response response;
@@ -60,13 +62,13 @@ public class AsyncUpdate extends AsyncTask<String, String, String> {
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        mProgressBar.setVisibility(View.VISIBLE);
+       // mProgressBar.setVisibility(View.VISIBLE);
     }
 
     @Override
     protected void onPostExecute(String s) {
         super.onPostExecute(s);
         mCallBack.updateFinished(s);
-        mProgressBar.setVisibility(View.INVISIBLE);
+      //  mProgressBar.setVisibility(View.INVISIBLE);
     }
 }

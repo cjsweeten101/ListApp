@@ -38,7 +38,7 @@ public class ListActivity extends AppCompatActivity implements  AddListFragment.
     List<String> mItems = new ArrayList<>();
     ListFragment mItemFragment;
     private Map<Integer, String> mSortedTitles = new TreeMap<>();
-    private Map<Integer,String> mSortedChildrenTitles;
+    private Map<Integer,String> mSortedChildrenTitles = new TreeMap<>();
     private Map<String, Integer> mSortedIds;
     private Map<Integer, JSONObject> mSortedObjects;
     private int mListId;
@@ -59,6 +59,10 @@ public class ListActivity extends AppCompatActivity implements  AddListFragment.
 
     private ProgressBar mProgressBar;
     private String mInviteTitle;
+    private int mCreatorId;
+    private String mToken;
+    private Bundle mBundle;
+    private boolean mBooleanCreate;
 
 
     @Override
@@ -104,10 +108,13 @@ public class ListActivity extends AppCompatActivity implements  AddListFragment.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
 
+        mParent= false;
         mProgressBar = (ProgressBar)findViewById(R.id.progressBar);
 
         mTeamID = getIntent().getExtras().getInt("ID");
         mTeamTitle = getIntent().getExtras().getString("TITLE");
+        mCreatorId = getIntent().getExtras().getInt("UserId");
+        mToken = getIntent().getExtras().getString("token");
         setTitle(mTeamTitle);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -152,56 +159,56 @@ public class ListActivity extends AppCompatActivity implements  AddListFragment.
         });
         inviteFab.show();
 
-
+        mBooleanCreate = true;
 
         AsyncGet asyncGet = new AsyncGet(this,mProgressBar);
-        Bundle bundle = new Bundle();
-        Map<Integer,JSONObject> sortedObjects = new TreeMap<>();
-        mSortedObjects = sortedObjects;
+     //   Bundle bundle = new Bundle();
+     //   Map<Integer,JSONObject> sortedObjects = new TreeMap<>();
+     //   mSortedObjects = sortedObjects;
 
-        try {
-            String getResult = asyncGet.execute("http://listaroo.herokuapp.com/api/lists?teamId="+mTeamID).get();
-            JSONArray results = new JSONArray(getResult);
-            for (int i = 0; i < results.length(); i++) {
-                JSONObject jsonObject = results.getJSONObject(i);
-                String title = jsonObject.opt("title").toString();
-                int id = jsonObject.optInt("id");
+    //    try {
+            asyncGet.execute("http://listaroo.herokuapp.com/api/lists?teamId="+mTeamID,mCreatorId+"",mToken+"");
+     //       JSONArray results = new JSONArray(getResult);
+     //       for (int i = 0; i < results.length(); i++) {
+     //           JSONObject jsonObject = results.getJSONObject(i);
+     //           String title = jsonObject.opt("title").toString();
+     //           int id = jsonObject.optInt("id");
 
-                sortedObjects.put(id,jsonObject);
-                mSortedTitles.put(id,title);
-                mTitles.add(title);
+                //sortedObjects.put(id,jsonObject);
+    //            mSortedTitles.put(id,title);
+    //            mTitles.add(title);
 
-            }
+      //      }
 
-            int i =0;
-            for(Map.Entry<Integer,String> entry : mSortedTitles.entrySet()){
-                String title = entry.getValue();
-                bundle.putString("TITLE"+i,title);
-                i++;
-
-            }
-
-
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+     //       int i =0;
+     //       for(Map.Entry<Integer,String> entry : mSortedTitles.entrySet()){
+     //           String title = entry.getValue();
+     //           bundle.putString("TITLE"+i,title);
+     //           i++;
+     //
+     //       }
 
 
-        bundle.putInt("LIST_SIZE",mTitles.size());
+//        } catch (InterruptedException e) {
+  //          e.printStackTrace();
+    //    } catch (ExecutionException e) {
+      //      e.printStackTrace();
+      //  } catch (JSONException e) {
+      //      e.printStackTrace();
+      //  }
 
-        ListFragment listFragment = new ListFragment();
-        mListFragment = listFragment;
-        mCurrentFragment = listFragment;
-        listFragment.setArguments(bundle);
-        FragmentManager fragmentManager1 = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager1.beginTransaction();
-        fragmentTransaction.add(R.id.PlaceHolderLists, listFragment, "LIST_FROM_DIALOG");
-        fragmentTransaction.commit();
-        mParent=true;
+
+      //  bundle.putInt("LIST_SIZE",mTitles.size());
+
+      //  ListFragment listFragment = new ListFragment();
+      //  mListFragment = listFragment;
+      //  mCurrentFragment = listFragment;
+      //  listFragment.setArguments(mBundle);
+      //  FragmentManager fragmentManager1 = getSupportFragmentManager();
+      //  FragmentTransaction fragmentTransaction = fragmentManager1.beginTransaction();
+      //  fragmentTransaction.add(R.id.PlaceHolderLists, listFragment, "LIST_FROM_DIALOG");
+      //  fragmentTransaction.commit();
+      //  mParent=true;
 
     }
 
@@ -209,7 +216,7 @@ public class ListActivity extends AppCompatActivity implements  AddListFragment.
     public String NewList(String title) {
 
         if(mAddListListener==true) {
-            mCurrentFragment.mAdapter.add(title, false, mTeamID, mParentId,this, mProgressBar);
+            mCurrentFragment.mAdapter.add(title, false, mTeamID, mParentId,this, mProgressBar, mCreatorId, mToken);
 
         } else {
             AsyncCreate asyncCreate = new AsyncCreate(this,mProgressBar);
@@ -218,7 +225,7 @@ public class ListActivity extends AppCompatActivity implements  AddListFragment.
                 mInviteTitle = title;
                 jsonObject.put("username", title);
 
-                asyncCreate.execute("http://listaroo.herokuapp.com/api/teams/" + mTeamID + "/invite", jsonObject.toString());
+                asyncCreate.execute("http://listaroo.herokuapp.com/api/teams/" + mTeamID + "/invite", jsonObject.toString(), mCreatorId+"",mToken+"");
 
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -232,6 +239,10 @@ public class ListActivity extends AppCompatActivity implements  AddListFragment.
 
     @Override
     public void onListSelected(int position, String title, View view) {
+
+      //  mSortedChildrenTitles.clear();
+       // mSortedTitles.clear();
+        //mTitles.clear();
 
         Map<Integer,String> sortedChildren = new TreeMap<>();
         AsyncGet asyncGet = new AsyncGet(this,mProgressBar);
@@ -256,7 +267,7 @@ public class ListActivity extends AppCompatActivity implements  AddListFragment.
 
         switch (view.getId()){
             case R.id.deleteButton:
-                mCurrentFragment.mAdapter.delete(position,ID);
+                mCurrentFragment.mAdapter.delete(position,ID, mCreatorId, mToken);
                 return;
             case R.id.editButton:
                 mCurrentId = ID;
@@ -270,13 +281,14 @@ public class ListActivity extends AppCompatActivity implements  AddListFragment.
 
         mInviteFab.hide();
 
-        try {
-            String results = asyncGet.execute("https://listaroo.herokuapp.com/api/lists/"+ID).get();
+     //   try {
+
+            asyncGet.execute("https://listaroo.herokuapp.com/api/lists/"+ID,mCreatorId+"",mToken+"");
 
             mParentId = ID;
 
             mQueue.add(ID);
-            JSONObject jsonObject = new JSONObject(results);
+           /* JSONObject jsonObject = new JSONObject(results);
 
             JSONArray jsonArray = jsonObject.getJSONArray("child_lists");
 
@@ -294,6 +306,7 @@ public class ListActivity extends AppCompatActivity implements  AddListFragment.
                     bundle.putString("TITLE" + i, bundleTitle);
                     i++;
                 }
+
                 bundle.putInt("LIST_SIZE", sortedChildren.size());
 
 
@@ -311,6 +324,7 @@ public class ListActivity extends AppCompatActivity implements  AddListFragment.
 
 
 
+
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
@@ -318,12 +332,13 @@ public class ListActivity extends AppCompatActivity implements  AddListFragment.
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        */
     }
 
     @Override
     public void Edit(String title) {
 
-        mCurrentFragment.mAdapter.update(title, mAdapterPosition, mCurrentId, mProgressBar, this);
+        mCurrentFragment.mAdapter.update(title, mAdapterPosition, mCurrentId, mProgressBar, this, mCreatorId, mToken );
         if(mParentId==0){
             mSortedTitles.put(mCurrentId,title);
         } else {
@@ -336,13 +351,13 @@ public class ListActivity extends AppCompatActivity implements  AddListFragment.
         Map<Integer,String> sortedChildren = new TreeMap<>();
         AsyncGet asyncGet = new AsyncGet(this,mProgressBar);
         JSONArray jsonArray = new JSONArray();
+        mParent = parent;
 
-        try {
+     //   try {
 
-            String results = asyncGet.execute(url).get();
-            Log.v("RESULTS",results);
+            asyncGet.execute(url,mCreatorId+"",mToken+"");
 
-            if(parent == true) {
+     /*       if(parent == true) {
                 JSONArray jsonArray1 = new JSONArray(results);
                 jsonArray = jsonArray1;
             } else {
@@ -384,8 +399,9 @@ public class ListActivity extends AppCompatActivity implements  AddListFragment.
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
-
+*/
     }
+
 
     @Override
     public void createFinished(String result) {
@@ -425,6 +441,100 @@ public class ListActivity extends AppCompatActivity implements  AddListFragment.
 
     @Override
     public void getFinished(String result) {
+        JSONArray jsonArray;
+        Bundle bundle = new Bundle();
+        Map<Integer,String> sortedTitles = new TreeMap<>();
+        try {
+
+            if (mBooleanCreate == true) {
+                mBooleanCreate= false;
+                //mParent=false;
+                try {
+                    JSONArray results = new JSONArray(result);
+                    for (int i = 0; i < results.length(); i++) {
+                        JSONObject jsonObject = results.getJSONObject(i);
+                        String title = jsonObject.opt("title").toString();
+                        int id = jsonObject.optInt("id");
+
+                        //sortedObjects.put(id,jsonObject);
+                        mSortedTitles.put(id,title);
+                        mTitles.add(title);
+
+                    }
+
+                    int i =0;
+                    for(Map.Entry<Integer,String> entry : mSortedTitles.entrySet()){
+                        String title = entry.getValue();
+                        bundle.putString("TITLE"+i,title);
+                        i++;
+
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                bundle.putInt("LIST_SIZE",mTitles.size());
+
+                ListFragment listFragment = new ListFragment();
+                mListFragment = listFragment;
+                mCurrentFragment = listFragment;
+                listFragment.setArguments(bundle);
+                FragmentManager fragmentManager1 = getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager1.beginTransaction();
+                fragmentTransaction.replace(R.id.PlaceHolderLists, listFragment, "LIST_FROM_DIALOG");
+                fragmentTransaction.commit();
+
+                return;
+
+            }
+
+                if (mParent == true) {
+                    JSONArray jsonArray1 = new JSONArray(result);
+                    jsonArray = jsonArray1;
+
+                } else {
+
+                    JSONObject jsonObject = new JSONObject(result);
+                    setTitle(jsonObject.optString("title"));
+
+                    jsonArray = jsonObject.getJSONArray("child_lists");
+                }
+
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    String childTitle = jsonArray.getJSONObject(i).optString("title");
+                    int childId = jsonArray.getJSONObject(i).optInt("id");
+
+                    mSortedChildrenTitles.put(childId, childTitle);
+                }
+                int i = 0;
+                for (Map.Entry<Integer, String> entry : mSortedChildrenTitles.entrySet()) {
+                    String bundleTitle = entry.getValue();
+                    bundle.putString("TITLE" + i, bundleTitle);
+                    i++;
+                }
+
+                bundle.putInt("LIST_SIZE", mSortedChildrenTitles.size());
+                ListFragment fragment = new ListFragment();
+                mItemFragment = fragment;
+                mCurrentFragment = fragment;
+                fragment.setArguments(bundle);
+
+                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+
+
+
+                transaction.replace(R.id.PlaceHolderLists, fragment, "CHILD");
+                transaction.commit();
+
+
+
+
+            }catch(JSONException e){
+                e.printStackTrace();
+            }
+
+
 
 
     }

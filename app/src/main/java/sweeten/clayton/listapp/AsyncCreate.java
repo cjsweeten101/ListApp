@@ -30,7 +30,7 @@ public class AsyncCreate extends AsyncTask<String, String, String> {
             = MediaType.parse("application/json; charset=utf-8");
 
     public interface CreateCallback {
-       public void createFinished(String result);
+       void createFinished(String result);
     }
 
     public AsyncCreate(Context context, ProgressBar progressBar) {
@@ -48,6 +48,8 @@ public class AsyncCreate extends AsyncTask<String, String, String> {
         Request request = new Request.Builder()
                 .url(params[0])
                 .addHeader("Content-Type","application/json")
+                .addHeader("useridaroo",params[2])
+                .addHeader("autharoo-token",params[3])
                 .post(body)
                 .build();
         Response response;
@@ -65,13 +67,13 @@ public class AsyncCreate extends AsyncTask<String, String, String> {
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        mProgressBar.setVisibility(View.VISIBLE);
+     //   mProgressBar.setVisibility(View.VISIBLE);
     }
 
     @Override
     protected void onPostExecute(String s) {
         super.onPostExecute(s);
         mCallback.createFinished(s);
-        mProgressBar.setVisibility(View.INVISIBLE);
+      //  mProgressBar.setVisibility(View.INVISIBLE);
     }
 }

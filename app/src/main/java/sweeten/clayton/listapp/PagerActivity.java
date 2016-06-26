@@ -1,8 +1,11 @@
 package sweeten.clayton.listapp;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
@@ -40,6 +43,16 @@ public class PagerActivity extends AppCompatActivity implements ListFragment.onL
     private ListFragment mListFragment;
     private int mCuurentId;
     private int mCurrentPosition;
+    private String mToken;
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.clear();
+        editor.commit();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +66,8 @@ public class PagerActivity extends AppCompatActivity implements ListFragment.onL
         setTitle("Your Teams:");
         int id = getIntent().getExtras().getInt("Id");
         mCreatorId = id;
+        String token = getIntent().getExtras().getString("token");
+        mToken = token;
         Log.v("ID", id+"");
 
         mProgressBar = (ProgressBar)findViewById(R.id.progressBar);
@@ -63,8 +78,8 @@ public class PagerActivity extends AppCompatActivity implements ListFragment.onL
         AsyncGet asyncGet1 = new AsyncGet(this,mProgressBar);
 
 
-        asyncGet.execute("http://listaroo.herokuapp.com/api/teams?userId="+id+"&type=created");
-        asyncGet1.execute("http://listaroo.herokuapp.com/api/teams?userId="+id+"&type=invited");
+        asyncGet.execute("http://listaroo.herokuapp.com/api/teams?userId="+id+"&type=created",mCreatorId+"",mToken+"");
+        asyncGet1.execute("http://listaroo.herokuapp.com/api/teams?userId="+id+"&type=invited",mCreatorId+"",mToken+"");
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         mFab= fab;
@@ -113,7 +128,7 @@ public class PagerActivity extends AppCompatActivity implements ListFragment.onL
         switch(view.getId()) {
 
             case R.id.deleteButton:
-                mListFragment.mAdapter.deleteTeams(position,id);
+                mListFragment.mAdapter.deleteTeams(position,id, mCreatorId, mToken);
                 return;
             case R.id.editButton:
                 mCuurentId = id;
@@ -126,6 +141,8 @@ public class PagerActivity extends AppCompatActivity implements ListFragment.onL
 
 
         }
+        intent.putExtra("UserId",mCreatorId);
+        intent.putExtra("token",mToken);
         startActivity(intent);
     }
 
@@ -145,7 +162,7 @@ public class PagerActivity extends AppCompatActivity implements ListFragment.onL
 
         }
         ListFragment listFragment = (ListFragment) mAdapter.getRegisteredFragment(mPager.getCurrentItem());
-        listFragment.mAdapter.addTeams(title, mCreatorId,this, mProgressBar);
+        listFragment.mAdapter.addTeams(title, mCreatorId,this, mProgressBar, mCreatorId, mToken);
         mNewTitle = title;
 
         return null;
@@ -236,7 +253,7 @@ public class PagerActivity extends AppCompatActivity implements ListFragment.onL
 
                     }
                 });
-                mProgressBar.setVisibility(View.INVISIBLE);
+               // mProgressBar.setVisibility(View.INVISIBLE);
             }
 
         } catch (JSONException e) {
@@ -247,7 +264,7 @@ public class PagerActivity extends AppCompatActivity implements ListFragment.onL
     @Override
     public void Edit(String title) {
 
-        mListFragment.mAdapter.updateTeam(title,mCurrentPosition,mCuurentId, mProgressBar, this);
+        mListFragment.mAdapter.updateTeam(title,mCurrentPosition,mCuurentId, mProgressBar, this, mCreatorId, mToken);
                 if(mTabPosition==0){
                     mSortedCreatedTeams.put(mCuurentId,title);
                 } else {
