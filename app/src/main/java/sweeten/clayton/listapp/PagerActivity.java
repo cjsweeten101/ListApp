@@ -1,13 +1,10 @@
 package sweeten.clayton.listapp;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
@@ -24,7 +21,6 @@ import org.json.JSONObject;
 
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.concurrent.ExecutionException;
 
 public class PagerActivity extends AppCompatActivity implements ListFragment.onListSelectedInterface, AddListFragment.OnNewListSelected, AsyncCreate.CreateCallback, AsyncGet.GetCallBack, EditDialogFragment.EditInterface, AsyncUpdate.UpdateCallBack{
     ViewPager mPager;
@@ -68,7 +64,6 @@ public class PagerActivity extends AppCompatActivity implements ListFragment.onL
         mCreatorId = id;
         String token = getIntent().getExtras().getString("token");
         mToken = token;
-        Log.v("ID", id+"");
 
         mProgressBar = (ProgressBar)findViewById(R.id.progressBar);
         mProgressBar.setVisibility(View.VISIBLE);
@@ -105,10 +100,8 @@ public class PagerActivity extends AppCompatActivity implements ListFragment.onL
         Intent intent = new Intent(this, ListActivity.class);
         int id = 0;
         if (mTabPosition == 0) {
-            Log.v("CREATEDCLCIK","HELLO");
             for (Map.Entry<Integer, String> entry : mSortedCreatedTeams.entrySet()) {
                 if (entry.getValue().equals(title)) {
-                    Log.v("CREATEDTEAMFOUND","SWUG");
                     intent.putExtra("TITLE", entry.getValue());
                     intent.putExtra("ID", entry.getKey());
                     id = entry.getKey();
@@ -181,8 +174,6 @@ public class PagerActivity extends AppCompatActivity implements ListFragment.onL
                 int id = jsonObject.optInt("id");
                 String title = jsonObject.optString("name");
                 mSortedCreatedTeams.put(id,title);
-                Log.v("ID",id +"");
-                Log.v("TITLE", mNewTitle);
             }
 
         } catch (JSONException e) {
@@ -205,7 +196,6 @@ public class PagerActivity extends AppCompatActivity implements ListFragment.onL
                     int teamId = jsonObject.optInt("id");
 
                     mSortedCreatedTeams.put(teamId, team);
-                    Log.v("FIRSTGET", team);
                 }
                 mGetCounter++;
             } else {
@@ -216,7 +206,6 @@ public class PagerActivity extends AppCompatActivity implements ListFragment.onL
                     int teamId = jsonObject.optInt("id");
 
                     mSortedInvitedTeams.put(teamId,team);
-                    Log.v("SECOND", team);
                 }
 
                 TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
