@@ -65,7 +65,7 @@ public class ListFragment extends android.support.v4.app.Fragment {
 
        for (int i = 0; i<size; i++ ){
            String content = getArguments().getString("TITLE"+i);
-           mAdapter.add(content,Boolean.TRUE, 0 , 0, getContext(),mProgressBar);
+           mAdapter.add(content,Boolean.TRUE, 0 , 0, getContext(),mProgressBar, 0 , "");
        }
 
         return view;

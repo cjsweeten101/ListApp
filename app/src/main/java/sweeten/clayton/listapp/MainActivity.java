@@ -2,9 +2,12 @@ package sweeten.clayton.listapp;
 
 
 import android.app.ActionBar;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -24,6 +27,8 @@ import java.util.concurrent.ExecutionException;
 public class MainActivity extends AppCompatActivity implements LoginFragment.OnSignUpSelected, LoginFragment.OnLoginSelected, SignupFragment.OnSignUp, AsyncCreate.CreateCallback {
     public static final String LIST_FRAGMENT = "list_fragment";
     private ProgressBar mProgressBar;
+    private String mUserName;
+    private String mToken;
 
 
     @Override
@@ -32,6 +37,25 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.OnS
         setContentView(R.layout.activity_main);
 
         mProgressBar = (ProgressBar)findViewById(R.id.progressBar);
+
+
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+
+        if(sharedPref.contains("USERNAME")) {
+          //Get the preferneces...
+
+            mUserName = sharedPref.getString("USERNAME", "FUCK");
+            mToken = sharedPref.getString("TOKEN", "");
+            int id = sharedPref.getInt("ID", 0 );
+
+            Log.v("id!!", id+"");
+
+            Intent intent = new Intent(this, PagerActivity.class);
+            intent.putExtra("Id", id );
+            intent.putExtra("token",mToken);
+            startActivity(intent);
+
+        }
 
         LoginFragment loginFragment = new LoginFragment();
         FragmentManager fragmentManager = getSupportFragmentManager();
@@ -55,10 +79,13 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.OnS
     public void LogIn(String userName, String password) {
         AsyncCreate asyncCreate = new AsyncCreate(this,mProgressBar);
     try {
+            mUserName = userName;
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("username", userName);
             jsonObject.put("password", password);
-            asyncCreate.execute("http://listaroo.herokuapp.com/api/login", jsonObject.toString());
+            asyncCreate.execute("http://listaroo.herokuapp.com/api/login", jsonObject.toString(), 0 + "",0+ "");
+            mProgressBar.setVisibility(View.VISIBLE);
+
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -70,6 +97,7 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.OnS
     public void SignUp(String UserName, String password, String ConfirmPassword, String FirstName, String LastName, String Email) {
 
             try {
+                mUserName = UserName;
                 Log.v("PASSWORD", password);
                 Log.v("PASSWORD CONFIRM",ConfirmPassword);
 
@@ -81,7 +109,8 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.OnS
                 jsonObject.put("first_name", FirstName);
                 jsonObject.put("last_name", LastName);
                 jsonObject.put("email",Email);
-                asyncCreate.execute("http://listaroo.herokuapp.com/api/signup", jsonObject.toString());
+                asyncCreate.execute("http://listaroo.herokuapp.com/api/signup", jsonObject.toString(), 0 + "", 0 + "");
+                mProgressBar.setVisibility(View.VISIBLE);
 
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -107,7 +136,17 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.OnS
                 } else {
 
                     int id = (int) jsonObjectResults.opt("id");
-                    int token = jsonObjectResults.optInt("api_token");
+                    String token = jsonObjectResults.optString("api_token");
+
+                    SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+                    SharedPreferences.Editor editor = sharedPref.edit();
+
+                    editor.putString("USERNAME", mUserName);
+                    editor.putString("TOKEN", token);
+                    editor.putInt("ID", id);
+                    editor.commit();
+
+
 
                     Intent intent = new Intent(this, PagerActivity.class);
                     intent.putExtra("Id", id);
