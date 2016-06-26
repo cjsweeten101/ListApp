@@ -2,7 +2,6 @@ package sweeten.clayton.listapp;
 
 import android.content.Context;
 import android.os.AsyncTask;
-import android.view.View;
 import android.widget.ProgressBar;
 
 import java.io.IOException;

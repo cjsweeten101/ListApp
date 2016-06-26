@@ -1,27 +1,19 @@
 package sweeten.clayton.listapp;
 
 
-import android.app.ActionBar;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-
-import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.concurrent.ExecutionException;
 
 
 public class MainActivity extends AppCompatActivity implements LoginFragment.OnSignUpSelected, LoginFragment.OnLoginSelected, SignupFragment.OnSignUp, AsyncCreate.CreateCallback {
@@ -47,8 +39,6 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.OnS
             mUserName = sharedPref.getString("USERNAME", "FUCK");
             mToken = sharedPref.getString("TOKEN", "");
             int id = sharedPref.getInt("ID", 0 );
-
-            Log.v("id!!", id+"");
 
             Intent intent = new Intent(this, PagerActivity.class);
             intent.putExtra("Id", id );
@@ -98,8 +88,6 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.OnS
 
             try {
                 mUserName = UserName;
-                Log.v("PASSWORD", password);
-                Log.v("PASSWORD CONFIRM",ConfirmPassword);
 
                 AsyncCreate asyncCreate = new AsyncCreate(this,mProgressBar);
                 JSONObject jsonObject = new JSONObject();
@@ -127,7 +115,6 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.OnS
             } else {
 
                 JSONObject jsonObjectResults = new JSONObject(result);
-                Log.v("CALLBACK RESULTS", result);
                 if (!(jsonObjectResults.opt("errors") == null)) {
                     String error = jsonObjectResults.optString("errors");
                    // String error = jsonObjectResults.getJSONArray("errors").getString(0);
