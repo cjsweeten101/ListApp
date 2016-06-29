@@ -6,7 +6,9 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.KeyEvent;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -49,9 +51,10 @@ public class ListActivity extends AppCompatActivity implements  AddListFragment.
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if(mQueue.size()<1){
+            finish();
             return super.onKeyDown(keyCode, event);
         } else {
-            if (keyCode == KeyEvent.KEYCODE_BACK) {
+            if (keyCode == KeyEvent.KEYCODE_BACK  || keyCode == KeyEvent.KEYCODE_HOME) {
 
                 mQueue.removeLast();
                 if (mQueue.size()<1) {
@@ -75,6 +78,18 @@ public class ListActivity extends AppCompatActivity implements  AddListFragment.
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                KeyEvent keyEvent = new KeyEvent(KeyEvent.KEYCODE_BACK,0);
+                onKeyDown(KeyEvent.KEYCODE_BACK, keyEvent );
+                break;
+        }
+        return true;
+    }
+
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
@@ -88,8 +103,12 @@ public class ListActivity extends AppCompatActivity implements  AddListFragment.
         mCreatorId = getIntent().getExtras().getInt("UserId");
         mToken = getIntent().getExtras().getString("token");
         setTitle(mTeamTitle);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+
+        toolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         mFloatingActionButton = fab;
