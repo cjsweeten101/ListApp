@@ -11,6 +11,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -51,6 +52,15 @@ public class PagerActivity extends AppCompatActivity implements ListFragment.onL
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+        return false;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pager);
@@ -81,13 +91,15 @@ public class PagerActivity extends AppCompatActivity implements ListFragment.onL
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                AddListFragment dialog = new AddListFragment();
-                Bundle bundle = new Bundle();
-                bundle.putBoolean("INVITE",false);
-                dialog.setArguments(bundle);
+                if(mTabPosition==0) {
+                    AddListFragment dialog = new AddListFragment();
+                    Bundle bundle = new Bundle();
+                    bundle.putBoolean("INVITE", false);
+                    dialog.setArguments(bundle);
 
-                FragmentManager fragmentManager = getSupportFragmentManager();
-                dialog.show(fragmentManager, "SWAG");
+                    FragmentManager fragmentManager = getSupportFragmentManager();
+                    dialog.show(fragmentManager, "SWAG");
+                }
             }
         });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -141,13 +153,12 @@ public class PagerActivity extends AppCompatActivity implements ListFragment.onL
 
     @Override
     public String NewList(String title) {
-
-        if(title.length()<1){
+        if (title.length() < 1) {
             Toast toast = Toast.makeText(this, "Please enter a title", Toast.LENGTH_LONG);
             toast.show();
         }
-        for(Map.Entry<Integer,String> entry : mSortedCreatedTeams.entrySet()) {
-            if(entry.getValue().equals(title)){
+        for (Map.Entry<Integer, String> entry : mSortedCreatedTeams.entrySet()) {
+            if (entry.getValue().equals(title)) {
                 Toast toast = Toast.makeText(this, "A team with that name already exists", Toast.LENGTH_LONG);
                 toast.show();
                 return null;
@@ -155,10 +166,11 @@ public class PagerActivity extends AppCompatActivity implements ListFragment.onL
 
         }
         ListFragment listFragment = (ListFragment) mAdapter.getRegisteredFragment(mPager.getCurrentItem());
-        listFragment.mAdapter.addTeams(title, mCreatorId,this, mProgressBar, mCreatorId, mToken);
+        listFragment.mAdapter.addTeams(title, mCreatorId, this, mProgressBar, mCreatorId, mToken);
         mNewTitle = title;
 
         return null;
+
     }
 
     @Override

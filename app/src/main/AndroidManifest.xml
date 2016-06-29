@@ -22,7 +22,7 @@
         <activity
             android:name=".ListActivity"
             android:label="@string/title_activity_list"
-            android:parentActivityName=".MainActivity"
+            android:parentActivityName=".PagerActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
