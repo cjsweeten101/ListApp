@@ -6,7 +6,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
@@ -45,8 +44,6 @@ public class ListActivity extends AppCompatActivity implements  AddListFragment.
     private String mInviteTitle;
     private int mCreatorId;
     private String mToken;
-    private boolean mBooleanCreate;
-
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -58,7 +55,6 @@ public class ListActivity extends AppCompatActivity implements  AddListFragment.
 
                 mQueue.removeLast();
                 if (mQueue.size()<1) {
-                    setTitle(mTeamTitle);
                     mInviteFab.show();
                     mParent = true;
                     mParentId = 0;
@@ -213,8 +209,8 @@ public class ListActivity extends AppCompatActivity implements  AddListFragment.
             case R.id.editButton:
                 mCurrentId = ID;
                 mAdapterPosition = position;
-
                 EditDialogFragment dialogFragment = new EditDialogFragment();
+                dialogFragment.setTextField(title);
                 FragmentManager fragmentManager = getSupportFragmentManager();
                 dialogFragment.show(fragmentManager,"EDIT");
                 return;
