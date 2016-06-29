@@ -139,6 +139,7 @@ public class PagerActivity extends AppCompatActivity implements ListFragment.onL
                 mCuurentId = id;
                 mCurrentPosition = position;
                 EditDialogFragment dialogFragment = new EditDialogFragment();
+                dialogFragment.setTextField(title);
                 FragmentManager fragmentManager = getSupportFragmentManager();
                 dialogFragment.show(fragmentManager,"EDIT");
                 return;

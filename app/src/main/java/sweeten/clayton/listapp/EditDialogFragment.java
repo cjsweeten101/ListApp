@@ -20,6 +20,7 @@ public class EditDialogFragment extends DialogFragment {
     EditText mEditText;
     String mTitle;
     TextView mPromptTitle;
+    private String mEditTitle;
 
     public interface EditInterface{
         void Edit(String title);
@@ -34,6 +35,9 @@ public class EditDialogFragment extends DialogFragment {
         final View view = inflater.inflate(R.layout.addlist_dialog,null);
         mPromptTitle = (TextView) view.findViewById(R.id.textViewDialog);
         mPromptTitle.setText("Please enter a new title");
+        mEditText = (EditText) view.findViewById(R.id.newTitle);
+        mEditText.setText(mEditTitle);
+
         builder.setView(view)
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
@@ -66,5 +70,9 @@ public class EditDialogFragment extends DialogFragment {
     public void onStart() {
         super.onStart();
         (getDialog()).getWindow().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.colorPrimary)));
+    }
+
+    public void setTextField(String title){
+       mEditTitle = title;
     }
 }
